@@ -138,7 +138,7 @@ export default function Home() {
   );
 
   return (
-    <div className="relative min-h-screen flex flex-col" style={{ background: 'var(--bg-primary)' }}>
+    <div className="relative flex min-h-[100dvh] flex-col" style={{ background: 'var(--bg-primary)' }}>
       <AuthModal
         isOpen={showAuthModal}
         onClose={closeAuthModal}

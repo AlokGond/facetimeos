@@ -117,8 +117,12 @@ export default function ParticipantList({
        * `ftos-panel`, not `dark:bg-[var(--bg-card,#12121a)]`. That fallback never
        * fired — `--bg-card` *is* defined, as a 3% white overlay — so the whole
        * drawer was see-through and the names sat on top of live video.
+       * `h-[100dvh]` rather than `h-full`: the drawer is `fixed`, so `h-full`
+       * resolves against the viewport, and on mobile that is the tall
+       * URL-bar-hidden viewport — the bottom of the list, where the host actions
+       * are, ended up under the browser chrome.
        */
-      className={`ftos-panel fixed right-0 top-0 z-50 flex h-full w-80 flex-col border-l shadow-2xl transition-transform duration-300 ease-in-out sm:w-96 ${
+      className={`ftos-panel fixed right-0 top-0 z-50 flex h-[100dvh] w-[85vw] max-w-sm flex-col border-l shadow-2xl transition-transform duration-300 ease-in-out sm:w-96 sm:max-w-none ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
       aria-hidden={!isOpen}

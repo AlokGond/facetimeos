@@ -39,13 +39,24 @@ export default function SpatialWindow({
 
   const meta = widgetMeta(type);
 
+  /**
+   * The floor on window size used to be a flat 320×220. On a phone the room
+   * container is around 360×640, so a window opened at 40% width was snapped up
+   * to 320px — nearly the whole screen — and then could not be resized down,
+   * while `bounds="parent"` let it be dragged until only a sliver showed. Clamp
+   * the floor to the container: on a narrow screen a widget takes the width it
+   * has, and on a desktop nothing changes.
+   */
+  const minWidth = Math.min(320, Math.max(160, containerSize.width || 320));
+  const minHeight = Math.min(220, Math.max(140, containerSize.height || 220));
+
   const pixelCoords = isMaximized
     ? { x: 0, y: 0, width: containerSize.width, height: containerSize.height }
     : {
         x: position.x * containerSize.width,
         y: position.y * containerSize.height,
-        width: Math.max(320, position.w * containerSize.width),
-        height: Math.max(220, position.h * containerSize.height),
+        width: Math.max(minWidth, position.w * containerSize.width),
+        height: Math.max(minHeight, position.h * containerSize.height),
       };
 
   const handleDragStop = (event, d) => {
@@ -87,8 +98,8 @@ export default function SpatialWindow({
       onDragStart={bringToFront}
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
-      minWidth={320}
-      minHeight={220}
+      minWidth={minWidth}
+      minHeight={minHeight}
       bounds="parent"
       dragHandleClassName="window-drag-handle"
       className="pointer-events-auto"

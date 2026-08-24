@@ -70,8 +70,18 @@ const TOOL_WIDGET = Object.freeze({ whiteboard: WINDOW_TYPES.WHITEBOARD, code: W
 
 const TOOL_LABEL = Object.freeze({ whiteboard: 'whiteboard', code: 'code editor' });
 
+/**
+ * `100dvh`, not `h-screen`.
+ *
+ * `h-screen` is `100vh`, which on mobile browsers means "the viewport with the
+ * URL bar hidden" — taller than what is actually visible. Anything anchored to
+ * the bottom, which here is the entire control bar, sits underneath the browser
+ * chrome and cannot be tapped. `dvh` tracks the visible height as the bar
+ * collapses. `w-full` rather than `w-screen` for the matching reason: `100vw`
+ * includes the scrollbar gutter and produces a sideways scroll.
+ */
 const shell =
-  'flex h-screen w-screen items-center justify-center bg-[var(--bg-base)] p-6 text-[var(--on-surface)]';
+  'flex min-h-[100dvh] w-full items-center justify-center bg-[var(--bg-base)] p-4 text-[var(--on-surface)] sm:p-6';
 
 /* `ftos-panel`, not `dark:bg-[var(--bg-card,#12121a)]` — the fallback in that
    arbitrary value never applied, because `--bg-card` is defined (as a 3% white
@@ -324,11 +334,22 @@ function StatusBar({
   savedNote,
   onShareLink,
 }) {
+  /**
+   * Every segment past the room name is progressively dropped on a narrow
+   * screen. The bar is `overflow-hidden`, so without this the phone layout kept
+   * the least useful things (a "here" suffix, the word "Live") and clipped the
+   * Share button, which is the only thing in here anyone taps.
+   */
   return (
-    <div className="pointer-events-auto absolute left-1/2 top-4 z-40 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 overflow-hidden rounded-full border border-stone-300 bg-stone-200/80 px-3.5 py-1.5 text-[11px] font-medium text-stone-700 shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-black/50 dark:text-white/80">
-      <span className="truncate font-semibold">{title || `Room ${String(roomId).slice(0, 8)}`}</span>
-      <span className="h-1 w-1 shrink-0 rounded-full bg-stone-400 dark:bg-white/30" />
-      <span className="shrink-0">{participantCount} here</span>
+    <div className="pointer-events-auto absolute left-1/2 top-3 z-40 flex max-w-[94vw] -translate-x-1/2 items-center gap-1.5 overflow-hidden rounded-full border border-stone-300 bg-stone-200/80 px-3 py-1.5 text-[11px] font-medium text-stone-700 shadow-lg backdrop-blur-md sm:top-4 sm:gap-2.5 sm:px-3.5 dark:border-white/10 dark:bg-black/50 dark:text-white/80">
+      <span className="max-w-[8rem] truncate font-semibold sm:max-w-none">
+        {title || `Room ${String(roomId).slice(0, 8)}`}
+      </span>
+      <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
+      <span className="shrink-0">
+        {participantCount}
+        <span className="hidden sm:inline"> here</span>
+      </span>
 
       {isHost ? (
         <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">
@@ -342,18 +363,20 @@ function StatusBar({
 
       {locked && <span title="Locked — new joiners need approval">🔒</span>}
 
-      <span className="h-1 w-1 shrink-0 rounded-full bg-stone-400 dark:bg-white/30" />
+      <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
       <span className="flex shrink-0 items-center gap-1.5" title={transportNote || undefined}>
         <span
           className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'animate-pulse bg-amber-500'}`}
         />
-        {connected ? 'Live' : 'Connecting…'}
+        <span className="hidden sm:inline">{connected ? 'Live' : 'Connecting…'}</span>
       </span>
 
       {savedNote && (
         <>
-          <span className="h-1 w-1 shrink-0 rounded-full bg-stone-400 dark:bg-white/30" />
-          <span className="shrink-0 text-emerald-600 dark:text-emerald-400">{savedNote}</span>
+          <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
+          <span className="hidden shrink-0 text-emerald-600 sm:inline dark:text-emerald-400">
+            {savedNote}
+          </span>
         </>
       )}
 
@@ -1116,7 +1139,10 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-[var(--bg-base,#0a0a0f)] text-white">
+    /* See the `shell` comment: dvh so the control bar is reachable on a phone,
+       and `text-[var(--on-surface)]` because a hard-coded `text-white` here made
+       every unstyled string in the room invisible in the light theme. */
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-[var(--bg-base,#0a0a0f)] text-[var(--on-surface)]">
       <VideoGrid
         localStream={localStream}
         remoteStreams={remoteStreams}

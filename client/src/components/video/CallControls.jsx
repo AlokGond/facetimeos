@@ -69,16 +69,22 @@ export default function CallControls({
    * the icons were pale grey on near-white and the toggled states were
    * indistinguishable from the untoggled ones.
    */
+  /* 40px on a phone, 44px from `sm` up. Ten of these at 44 plus gaps and two
+     dividers is ~520px, which does not fit a 375px screen at any gap; shrinking
+     the buttons alone is not enough either, which is why the bar wraps. 40 is
+     still a comfortable touch target. */
   const btn =
-    'relative flex h-11 w-11 items-center justify-center rounded-xl border text-sm transition-colors duration-150 text-[var(--on-surface)] hover:bg-[var(--bg-muted)] disabled:opacity-40 disabled:hover:bg-transparent';
+    'relative flex h-10 w-10 items-center justify-center rounded-xl border text-sm transition-colors duration-150 text-[var(--on-surface)] hover:bg-[var(--bg-muted)] disabled:opacity-40 disabled:hover:bg-transparent sm:h-11 sm:w-11';
   const plain = `${btn} border-transparent`;
   const danger =
     'border-red-600/40 bg-red-100 text-red-700 dark:border-red-500/30 dark:bg-red-500/20 dark:text-red-300';
   const active =
     'border-indigo-600/40 bg-indigo-100 text-indigo-800 dark:border-indigo-400/30 dark:bg-indigo-500/25 dark:text-indigo-100';
-  /* Shared by both pop-up trays: opaque, because they open over live video. */
+  /* Shared by both pop-up trays: opaque, because they open over live video. The
+     max-width matters once the bar wraps on a phone — a tray centred on a button
+     near the screen edge would otherwise run off it. */
   const tray =
-    'ftos-panel absolute bottom-14 left-1/2 z-50 -translate-x-1/2 rounded-2xl border shadow-2xl';
+    'ftos-panel absolute bottom-14 left-1/2 z-50 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 rounded-2xl border shadow-2xl';
 
   const widgets = [
     { type: 'CODE_EDITOR', icon: '⌨️', label: 'Code editor' },
@@ -91,7 +97,7 @@ export default function CallControls({
   return (
     <div
       ref={barRef}
-      className="ftos-rise fixed bottom-5 left-1/2 z-50 flex max-w-[95vw] -translate-x-1/2 items-center gap-2 overflow-visible rounded-2xl px-4 py-3"
+      className="ftos-rise fixed bottom-3 left-1/2 z-50 flex max-w-[95vw] -translate-x-1/2 flex-wrap items-center justify-center gap-1.5 overflow-visible rounded-2xl px-3 py-2.5 sm:bottom-5 sm:gap-2 sm:px-4 sm:py-3"
       style={{
         // `--surface-overlay`, not `--bg-nav`: the bar sits on top of somebody's
         // face, and the nav token is tuned for a solid page behind it.
@@ -148,7 +154,10 @@ export default function CallControls({
         </button>
       )}
 
-      <div className="mx-1 h-7 w-px" style={{ background: 'var(--surface-border)' }} />
+      <div
+        className="mx-1 hidden h-7 w-px sm:block"
+        style={{ background: 'var(--surface-border)' }}
+      />
 
       {/* One tray for all five widgets. Five separate buttons pushed the bar wider
           than a laptop screen once screen share and export were added. */}
@@ -218,7 +227,7 @@ export default function CallControls({
           </button>
 
           {menu === 'reactions' && (
-            <div className={`${tray} flex items-center gap-1 p-2`}>
+            <div className={`${tray} flex flex-wrap items-center justify-center gap-1 p-2`}>
               {REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -294,7 +303,10 @@ export default function CallControls({
         </button>
       )}
 
-      <div className="mx-1 h-7 w-px" style={{ background: 'var(--surface-border)' }} />
+      <div
+        className="mx-1 hidden h-7 w-px sm:block"
+        style={{ background: 'var(--surface-border)' }}
+      />
 
       <button
         type="button"

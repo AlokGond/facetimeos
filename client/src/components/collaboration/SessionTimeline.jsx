@@ -63,7 +63,9 @@ export default function SessionTimeline({
 
   return (
     <div
-      className="ftos-fade fixed bottom-24 left-4 top-16 z-50 flex w-80 flex-col overflow-hidden rounded-2xl border shadow-2xl sm:w-96"
+      /* Full width on a phone, and clear of the control bar's second row — see the
+         same note in ChatPanel. */
+      className="ftos-fade fixed bottom-28 left-3 right-3 top-14 z-50 flex flex-col overflow-hidden rounded-2xl border shadow-2xl sm:bottom-24 sm:right-auto sm:left-4 sm:top-16 sm:w-96"
       style={{
         background: 'var(--surface-panel)',
         borderColor: 'var(--surface-border)',
