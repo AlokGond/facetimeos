@@ -1,0 +1,378 @@
+@import "tailwindcss";
+
+/**
+ * Tailwind 4 decides `dark:` by `prefers-color-scheme` unless told otherwise, but
+ * the theme provider writes a class onto <html>. Without this the theme switcher
+ * appeared to do nothing: every `dark:` utility in the app kept following the OS
+ * instead of the choice the user just made.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ========== Dark Theme (default) ========== */
+:root,
+html.dark {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #111118;
+  --bg-tertiary: #18181f;
+  /* The call surface and the panel fills. Named separately from --bg-primary
+     because the room is deliberately darker than the marketing pages. */
+  --bg-base: #0a0a0f;
+  --bg-muted: rgba(255, 255, 255, 0.05);
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-glass: rgba(255, 255, 255, 0.04);
+  --bg-glass-hover: rgba(255, 255, 255, 0.07);
+  --bg-nav: rgba(10, 10, 15, 0.8);
+  --bg-input: rgba(255, 255, 255, 0.04);
+  --bg-input-border: rgba(255, 255, 255, 0.08);
+  --accent-primary: #f97066;
+  --accent-secondary: #fb923c;
+  --accent-tertiary: #fbbf24;
+  --text-primary: #f0f0f5;
+  --text-secondary: #9ca3af;
+  /* Was #6b7280, which is 4.0:1 on this background — under the 4.5:1 floor at the
+     11–12px sizes it is actually used at, so captions and helper text were the
+     first thing to disappear. */
+  --text-muted: #8e94a3;
+  /* 6% white is invisible as a card edge on #0a0a0f: the feature cards on the
+     landing page had no discernible outline at all. */
+  --border-subtle: rgba(255, 255, 255, 0.11);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --glow-primary: rgba(249, 112, 102, 0.12);
+
+  /**
+   * Room chrome, kept separate from the page tokens above.
+   *
+   * `--bg-card` and `--bg-glass` are 3–4% white overlays. They read correctly on
+   * a dark marketing page, where there is a solid background behind them — but a
+   * panel in the room floats over live video, so a 3% fill is simply
+   * transparent. That is why the participant list and the widget tray appeared to
+   * have no background at all and their text sat unreadable on top of somebody's
+   * face. These four are opaque (or near enough) in both themes and are what the
+   * room's panels, menus and pills use.
+   */
+  --surface-panel: #14141c;
+  --surface-raised: #1e1e28;
+  --surface-overlay: rgba(16, 16, 24, 0.82);
+  --surface-border: rgba(255, 255, 255, 0.14);
+  --on-surface: #f4f4f7;
+  --on-surface-muted: #a8a8b8;
+  --notice-warn-bg: #3a2a12;
+  --notice-warn-border: rgba(251, 191, 36, 0.45);
+  --notice-warn-text: #fde68a;
+  --notice-info-bg: #16233a;
+  --notice-info-border: rgba(96, 165, 250, 0.45);
+  --notice-info-text: #bfdbfe;
+  color-scheme: dark;
+}
+
+/* ========== Light Theme ========== */
+html.light {
+  --bg-primary: #fafaf9;
+  --bg-secondary: #f5f5f4;
+  --bg-tertiary: #e7e5e4;
+  --bg-base: #e7e5e4;
+  --bg-muted: rgba(0, 0, 0, 0.04);
+  --bg-card: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --bg-glass-hover: rgba(255, 255, 255, 0.95);
+  --bg-nav: rgba(250, 250, 249, 0.92);
+  --bg-input: #ffffff;
+  --bg-input-border: rgba(0, 0, 0, 0.15);
+  --accent-primary: #e85d4f;
+  --accent-secondary: #f97066;
+  --accent-tertiary: #fb923c;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #615c57;
+  --border-subtle: rgba(0, 0, 0, 0.14);
+  --border-hover: rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
+  --glow-primary: rgba(232, 93, 79, 0.12);
+
+  /* Light-mode room chrome. Warm greys rather than pure white: a white panel over
+     bright video has no edge, and the whole call reads as washed out. */
+  --surface-panel: #ffffff;
+  --surface-raised: #f1efee;
+  --surface-overlay: rgba(255, 255, 255, 0.9);
+  --surface-border: rgba(28, 25, 23, 0.14);
+  --on-surface: #1c1917;
+  --on-surface-muted: #57534e;
+  --notice-warn-bg: #fef3c7;
+  --notice-warn-border: rgba(180, 83, 9, 0.35);
+  --notice-warn-text: #78350f;
+  --notice-info-bg: #dbeafe;
+  --notice-info-border: rgba(29, 78, 216, 0.3);
+  --notice-info-text: #1e3a8a;
+  color-scheme: light;
+}
+
+/* ========== Base ========== */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Subtle background glow — adds depth, removes flat AI feel */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249,112,102,0.07), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(99,102,241,0.04), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
+
+/* ========== Selection ========== */
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: inherit;
+}
+
+/* ========== Utility Classes ========== */
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+}
+
+.accent-text {
+  color: var(--accent-primary);
+  letter-spacing: -0.02em;
+}
+
+.gradient-btn {
+  background: var(--accent-primary);
+  box-shadow: 0 1px 4px rgba(249, 112, 102, 0.2);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+.gradient-btn:hover {
+  box-shadow: 0 2px 12px rgba(249, 112, 102, 0.35);
+  transform: translateY(-1px);
+}
+.gradient-btn:active {
+  transform: translateY(0);
+}
+
+/* ========== Animations ========== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-15px) scale(1.01); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 2px 12px rgba(99,102,241,0.25); }
+  50% { box-shadow: 0 4px 24px rgba(99,102,241,0.4); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+.animate-scale-in { animation: scale-in 0.3s ease-out forwards; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+/* ========== Card Styles ========== */
+/* `--bg-secondary`, not `--bg-card`: the latter is a 3% white overlay in dark
+   mode, so a card sitting on the near-black page read as no card at all. */
+.feature-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.25s ease;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.feature-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-card-hover);
+}
+.feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.step-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.25s ease;
+}
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--accent-primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.step-card:hover {
+  border-color: var(--border-hover);
+}
+.step-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* ========== Table Row ========== */
+.table-row { transition: background-color 0.15s ease; }
+.table-row:hover { background-color: var(--bg-muted); }
+
+/* ========== Stat Badge ========== */
+.stat-badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+.stat-badge:hover {
+  border-color: var(--border-hover);
+}
+
+/**
+ * ========== Room chrome ==========
+ *
+ * Panel fills for anything that floats over live video. These are the classes to
+ * reach for instead of `bg-[var(--bg-card)]` / `bg-[var(--bg-glass)]`, which are
+ * 3–4% white overlays and read as fully transparent once there is a face behind
+ * them.
+ */
+.ftos-panel {
+  background: var(--surface-panel);
+  border-color: var(--surface-border);
+  color: var(--on-surface);
+}
+
+/* One step up from a panel: rows, inputs and menu items *inside* a panel. */
+.ftos-raised {
+  background: var(--surface-raised);
+  border-color: var(--surface-border);
+  color: var(--on-surface);
+}
+
+/* Name tags and status chips sitting directly on video — translucent on purpose,
+   but with a blur behind them so the text keeps its contrast either way. */
+.ftos-pill {
+  background: var(--surface-overlay);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--on-surface);
+}
+
+.ftos-muted { color: var(--on-surface-muted); }
+
+.ftos-notice-warn {
+  background: var(--notice-warn-bg);
+  border: 1px solid var(--notice-warn-border);
+  color: var(--notice-warn-text);
+}
+
+.ftos-notice-info {
+  background: var(--notice-info-bg);
+  border: 1px solid var(--notice-info-border);
+  color: var(--notice-info-text);
+}
+
+/**
+ * These three are load-bearing: the call controls, the chat and timeline panels,
+ * and every scrolling list in the room already reference them by name. Panels
+ * that appear without them still work, they just snap into place.
+ */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hover) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 4px;
+}
+
+/**
+ * Y-axis only, deliberately.
+ *
+ * Tailwind 4 compiles `-translate-x-1/2` to the CSS `translate` property, not to
+ * `transform`. The two compose, so a keyframe that also carried `translate(-50%, …)`
+ * moved a centred element by a full 100% of its width — which is exactly why the
+ * call controls sat flush against the left edge of the room instead of under the
+ * middle of the video. Centring belongs to the utility class; the animation only
+ * moves things up.
+ */
+@keyframes ftos-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ftos-rise { animation: ftos-rise 0.22s ease-out both; }
+
+@keyframes ftos-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ftos-fade { animation: ftos-fade 0.18s ease-out both; }
+
+/* Respect the OS setting: none of these animations carry information. */
+@media (prefers-reduced-motion: reduce) {
+  .ftos-rise,
+  .ftos-fade,
+  .animate-float,
+  .animate-float-slow,
+  .animate-pulse-glow {
+    animation: none;
+  }
+}
