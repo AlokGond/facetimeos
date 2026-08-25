@@ -34,6 +34,16 @@ test.before(async () => {
       JWT_SECRET: 'test-secret-that-is-definitely-long-enough-32',
       DOC_STORE_DIR: dataDir,
       CLIENT_ORIGIN: '',
+      // These cases assert the no-relay behaviour, so the relay configuration has
+      // to be cleared rather than assumed absent: a developer with a working
+      // `server/.env` would otherwise fail two tests for doing the right thing.
+      // `turn.test.js` covers the configured cases.
+      TURN_URLS: '',
+      TURN_SECRET: '',
+      TURN_USERNAME: '',
+      TURN_PASSWORD: '',
+      METERED_APP_NAME: '',
+      METERED_API_KEY: '',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });

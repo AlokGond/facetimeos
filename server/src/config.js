@@ -83,6 +83,39 @@ export const TURN = {
   staticPassword: process.env.TURN_PASSWORD || null,
 };
 
+/**
+ * Metered.ca relay, as an alternative to running coturn.
+ *
+ * It does not fit the `TURN` block above. coturn hands you a shared secret and
+ * you mint credentials from it; Metered mints the credentials itself and hands
+ * you a key that reads them back. So instead of signing anything, the server
+ * fetches a ready-made ICE list from
+ * `<apiBase>/api/v1/turn/credentials?apiKey=…` and merges it into its own.
+ *
+ * `apiKey` is the credential-scoped key, which Metered documents as safe to use
+ * from a browser. It stays on the server regardless: the client already gets its
+ * ICE list from `/rtc/ice`, one round trip either way, and keeping the key here
+ * means a rotation is a server restart rather than a client deploy.
+ *
+ * `apiBase` exists so the tests can point this at a local stub — and, less
+ * theoretically, so a deployment can route through its own proxy. Leave it
+ * unset in production.
+ */
+export const METERED = {
+  appName: process.env.METERED_APP_NAME || null,
+  apiKey: process.env.METERED_API_KEY || null,
+  /** Paid plans only; the free plan is pinned to `standard.relay.metered.ca`. */
+  region: process.env.METERED_REGION || null,
+  apiBase: process.env.METERED_API_BASE || null,
+  /**
+   * How long to reuse a fetched list. Metered's credentials are long-lived
+   * unless created with an expiry, so this is about not making an outbound call
+   * per join — not about credential freshness. A revoked credential still stops
+   * working within one window.
+   */
+  cacheSeconds: int(process.env.METERED_CACHE_SECONDS, 600),
+};
+
 export const STUN_URLS = list(process.env.STUN_URLS).length
   ? list(process.env.STUN_URLS)
   : ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'];

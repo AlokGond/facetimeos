@@ -18,7 +18,7 @@ import {
 } from './auth.js';
 import { roomManager } from './room-manager.js';
 import { setupSignaling } from './signaling.js';
-import { buildIceConfig, turnConfigured } from './turn.js';
+import { buildIceConfig, turnConfigured, turnProviders } from './turn.js';
 import * as docStore from './doc-store.js';
 
 const app = express();
@@ -69,11 +69,20 @@ api.get('/health', (req, res) => {
  * fetch this at call setup instead of hardcoding a STUN-only list — without a
  * relay, peers behind symmetric NAT or UDP-blocking firewalls never connect.
  */
-api.get('/ice', (req, res) => {
+api.get('/ice', async (req, res) => {
   const claims = verifySessionToken(String(req.query.sessionToken || ''));
-  // Credentials are bound to a peer when we know one, so a leaked credential is
-  // attributable and expires on its own.
-  res.json(buildIceConfig(claims ? `${claims.roomId}:${claims.peerId}` : 'anon'));
+  try {
+    // Credentials are bound to a peer when we know one, so a leaked credential is
+    // attributable and expires on its own.
+    res.json(await buildIceConfig(claims ? `${claims.roomId}:${claims.peerId}` : 'anon'));
+  } catch (error) {
+    // `buildIceConfig` swallows relay-provider failures itself, so reaching here
+    // means something unforeseen. Express 4 does not catch async rejections, and
+    // an unhandled one here would leave the join hanging on a socket that never
+    // answers.
+    console.error('[turn] ICE config failed:', error.message);
+    res.status(500).json({ error: 'ice-unavailable' });
+  }
 });
 
 /**
@@ -227,7 +236,13 @@ evictionTimer.unref();
 httpServer.listen(PORT, () => {
   console.log(`[server] signaling + authority listening on :${PORT}`);
   console.log(`[server] origins: ${CLIENT_ORIGINS ? CLIENT_ORIGINS.join(', ') : '(reflecting request origin — dev only)'}`);
-  console.log(`[server] TURN relay: ${turnConfigured() ? 'configured' : 'NOT configured (calls will fail behind symmetric NAT)'}`);
+  console.log(
+    `[server] TURN relay: ${
+      turnConfigured()
+        ? turnProviders().join(' + ')
+        : 'NOT configured (calls will fail behind symmetric NAT)'
+    }`
+  );
 });
 
 async function shutdown(signal) {

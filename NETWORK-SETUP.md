@@ -136,6 +136,126 @@ signaling server (no rewrite in the way) and is guaranteed to work.
 
 ---
 
+## Both devices joined, but video never arrives → you need a TURN relay
+
+Different symptom from the one above: each device shows **2 participants**, chat
+and the shared widgets work, but one or both video tiles stay black, and the
+status pill's transport note says the connection is still checking or failed.
+
+Signaling did its job here; the media path is what failed. STUN only tells each
+peer its own public address — it works when at least one side can be reached
+directly. Behind symmetric NAT, CGNAT (most mobile carriers), or a firewall that
+blocks UDP (most corporate networks), no direct path exists and the media has to
+be **relayed**. That is what a TURN server does, and it is the difference between
+"works on my laptop" and "works for everyone" — roughly 8–15% of real-world peer
+pairs need it.
+
+Two devices on the same home Wi-Fi usually connect without one, which is why this
+only shows up once you test across networks (phone on mobile data, or a laptop on
+an office network).
+
+### Option A: Metered.ca — hosted, free tier, nothing to run
+
+1. Sign up at <https://www.metered.ca> and open the dashboard.
+2. The **app name** on the home page forms your API host,
+   `https://<appname>.metered.live`. Copy it.
+3. Go to **TURN → Credentials**, create a credential, and copy its **API key**
+   (the per-credential key, *not* the account secret key).
+4. Put both in `server/.env`:
+
+   ```
+   METERED_APP_NAME=your-app-name
+   METERED_API_KEY=your-credential-api-key
+   ```
+
+5. Restart the signaling server. The boot log should now read
+   `[server] TURN relay: metered (default region)` instead of
+   `NOT configured`.
+
+The server fetches the credential list from Metered, caches it for ten minutes
+(`METERED_CACHE_SECONDS`), and merges the relay entries into what `/rtc/ice`
+hands the browser. The API key stays on the server, so rotating it is a restart
+rather than a client deploy. `METERED_REGION` is a paid-plan feature — on the
+free plan leave it unset and you get the shared `standard.relay.metered.ca` host.
+
+If Metered is unreachable or the key is wrong, the server logs a warning and
+serves a STUN-only list rather than failing the join: calls that would have
+connected anyway still connect.
+
+### Option B: any provider, static credentials
+
+Works with Twilio, Cloudflare Calls, Metered's dashboard credentials, or a
+coturn box configured with a fixed user:
+
+```
+TURN_URLS=turn:standard.relay.metered.ca:80,turn:standard.relay.metered.ca:443,turns:standard.relay.metered.ca:443?transport=tcp
+TURN_USERNAME=...
+TURN_PASSWORD=...
+```
+
+Include the port 443 and `turns:` entries. Port 443 over TLS is what gets
+through firewalls that block everything else, because it is indistinguishable
+from ordinary HTTPS.
+
+### Option C: self-hosted coturn
+
+Set `TURN_URLS` and `TURN_SECRET`, where `TURN_SECRET` equals coturn's
+`static-auth-secret`. The server then mints a short-lived HMAC credential per
+peer, so no long-lived password ever reaches a browser and a leaked one expires
+on its own. `TURN_TTL_SECONDS` controls the lifetime (default 24h).
+
+All three can be set at once — the list is merged and the browser uses whichever
+answers first.
+
+### Checking it worked
+
+```bash
+npm run turn:check --prefix server
+```
+
+That does the thing a browser would do, without a browser: it takes the relay
+list the server would hand out and performs a real TURN allocation against each
+URL, using the long-term credential mechanism. A healthy run looks like this:
+
+```
+configured: metered (default region)
+stun: 2 server(s)
+
+Allocating against 4 relay URL(s):
+
+  ✓ turn:global.relay.metered.ca:80  (296ms)
+      relayed address: 64.227.188.203:26905
+      allocation lifetime: 600s (released)
+  ...
+4 of 4 relay URL(s) allocated successfully.
+```
+
+A relayed address means the relay is reachable from this network, the
+credentials authenticate, and the provider is willing to allocate — which is the
+whole media path short of actually sending video through it. Each allocation is
+released immediately, so the check costs a handful of packets rather than quota.
+The script exits non-zero when nothing allocates, so CI or a deploy hook can
+gate on it.
+
+`401` against every URL means the credentials are wrong or the dashboard
+credential was revoked. A timeout on some URLs but not others is normal on a
+restricted network and is exactly why several ports are offered.
+
+The lighter check, if you only want to know whether the server *has* credentials:
+
+```bash
+curl -s http://localhost:3001/rtc/ice
+```
+
+`hasTurn` must be `true`, with `turn:`/`turns:` entries carrying a `username`
+and `credential`. Note that this proves nothing about reachability — that is what
+the allocation check above is for.
+
+During a real call, Chrome's `chrome://webrtc-internals` shows the selected
+candidate pair; a pair of type `relay` means media is going through TURN.
+
+---
+
 ## Advanced: two tunnels (native WebSocket)
 
 Only needed if you specifically want a raw WebSocket for signaling.
