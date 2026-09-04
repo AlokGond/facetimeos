@@ -2,7 +2,9 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
+  GoogleAuthProvider,
   onAuthStateChanged,
+  signInWithCredential,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -76,7 +78,26 @@ export function AuthProvider({ children }) {
     return result;
   }, []);
 
-  const loginWithGoogle = useCallback(() => {
+  /**
+   * Google sign-in, by two different routes.
+   *
+   * In a browser this is `signInWithPopup`. In the Windows desktop shell it cannot
+   * be: Google refuses OAuth inside an embedded user agent, so the popup would
+   * load `disallowed_useragent` and stop there. The shell therefore runs the
+   * native-app flow (RFC 8252 — authorization code with PKCE, in the user's real
+   * browser, redirect caught on loopback) and hands back a Google ID token, which
+   * becomes an ordinary Firebase credential here.
+   *
+   * Same provider, same uid, same account as on the web. The branch is a feature
+   * check rather than a user-agent sniff, so the web build is untouched by it.
+   */
+  const loginWithGoogle = useCallback(async () => {
+    const desktop = typeof window !== 'undefined' ? window.facetimeosDesktop : null;
+    if (desktop?.signInWithGoogle) {
+      const { idToken } = await desktop.signInWithGoogle();
+      if (!idToken) throw new Error('Sign-in did not complete.');
+      return signInWithCredential(requireAuth(), GoogleAuthProvider.credential(idToken));
+    }
     if (!googleProvider) throw new Error('Google sign-in is not enabled on this deployment.');
     return signInWithPopup(requireAuth(), googleProvider);
   }, []);
