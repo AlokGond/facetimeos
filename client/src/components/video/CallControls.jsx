@@ -43,11 +43,21 @@ function Icon({ name, size = 18 }) {
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-function DockButton({ icon, label, active = false, danger = false, critical = false, badge, className = '', ...props }) {
+function DockButton({
+  icon,
+  label,
+  displayLabel = label,
+  active = false,
+  danger = false,
+  critical = false,
+  badge,
+  className = '',
+  ...props
+}) {
   return (
     <button
       type="button"
-      className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border text-[var(--on-surface)] transition-[background-color,border-color,color,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-35 sm:h-11 sm:w-11 ${
+      className={`relative flex h-14 w-12 shrink-0 flex-col items-center justify-center gap-1 rounded-[10px] border px-1 text-[var(--on-surface)] transition-[background-color,border-color,color,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-35 max-[360px]:w-10 sm:h-[3.75rem] sm:w-14 md:w-[4.5rem] ${
         critical
           ? 'border-[#ef5358] bg-[#e5484d] text-white shadow-[0_5px_16px_rgba(229,72,77,0.28)] hover:border-[#f4666b] hover:bg-[#ed555a]'
           : danger
@@ -61,9 +71,11 @@ function DockButton({ icon, label, active = false, danger = false, critical = fa
       {...props}
     >
       <Icon name={icon} />
-      <span className="sr-only">{label}</span>
+      <span className="block max-w-full truncate text-[10px] font-semibold leading-none tracking-[-0.01em] sm:text-[11px] md:text-xs">
+        {displayLabel}
+      </span>
       {badge != null && (
-        <span className="absolute -right-0.5 -top-1 grid h-[17px] min-w-[17px] place-items-center rounded-full border-2 border-[#151a22] bg-[#4f7fe8] px-0.5 text-[9px] font-bold leading-none text-white">
+        <span className="absolute right-0.5 top-0.5 grid h-[17px] min-w-[17px] place-items-center rounded-full border-2 border-[#151a22] bg-[#4f7fe8] px-0.5 text-[9px] font-bold leading-none text-white">
           {badge}
         </span>
       )}
@@ -125,7 +137,7 @@ export default function CallControls({
     { type: 'MEETING_TIMER', icon: 'timer', label: 'Meeting timer' },
   ];
 
-  const tray = 'room-drawer absolute bottom-[3.25rem] z-50 p-2 text-[var(--on-surface)] sm:bottom-[3.65rem]';
+  const tray = 'room-drawer absolute bottom-[4rem] z-50 p-2 text-[var(--on-surface)] sm:bottom-[4.4rem]';
   const menuRow = 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors hover:bg-white/[0.07]';
 
   return (
@@ -134,12 +146,20 @@ export default function CallControls({
       className="control-dock ftos-rise fixed bottom-3 left-1/2 z-50 flex max-w-[calc(100vw-1rem)] -translate-x-1/2 items-center gap-0.5 p-1 sm:bottom-4 sm:gap-1 sm:p-1.5"
       aria-label="Meeting controls"
     >
-      <DockButton icon={isMuted ? 'micOff' : 'mic'} label={isMuted ? 'Unmute' : 'Mute'} danger={isMuted} onClick={onToggleMic} aria-pressed={isMuted} />
-      <DockButton icon={isCameraOff ? 'cameraOff' : 'camera'} label={isCameraOff ? 'Start video' : 'Stop video'} danger={isCameraOff} onClick={onToggleCamera} aria-pressed={isCameraOff} />
+      <DockButton
+        icon={isMuted ? 'micOff' : 'mic'}
+        label={isMuted ? 'Unmute microphone' : 'Mute microphone'}
+        displayLabel={<><span className="hidden md:inline">Microphone</span><span className="md:hidden">Mic</span></>}
+        danger={isMuted}
+        onClick={onToggleMic}
+        aria-pressed={isMuted}
+      />
+      <DockButton icon={isCameraOff ? 'cameraOff' : 'camera'} label={isCameraOff ? 'Start camera' : 'Stop camera'} displayLabel="Camera" danger={isCameraOff} onClick={onToggleCamera} aria-pressed={isCameraOff} />
       {onToggleScreenShare && (
         <DockButton
           icon="screen"
           label={isScreenSharing ? 'Stop sharing' : 'Share screen'}
+          displayLabel="Screen"
           active={isScreenSharing}
           disabled={!canShareScreen}
           onClick={onToggleScreenShare}
@@ -148,7 +168,7 @@ export default function CallControls({
         />
       )}
 
-      <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
+      <span className="mx-1 hidden h-8 w-px bg-white/10 sm:block" aria-hidden="true" />
 
       <div className="relative">
         <DockButton
@@ -220,12 +240,13 @@ export default function CallControls({
         )}
       </div>
 
-      <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
+      <span className="mx-1 hidden h-8 w-px bg-white/10 sm:block" aria-hidden="true" />
 
       <div className="relative">
         <DockButton
           icon="leave"
           label={isHost && onEndForAll ? 'Leave options' : 'Leave meeting'}
+          displayLabel="Leave"
           critical
           onClick={() => {
             if (isHost && onEndForAll) {

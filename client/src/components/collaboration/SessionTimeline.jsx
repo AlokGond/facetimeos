@@ -63,9 +63,7 @@ export default function SessionTimeline({
 
   return (
     <div
-      /* Full width on a phone, and clear of the control bar's second row — see the
-         same note in ChatPanel. */
-      className="room-drawer ftos-fade fixed bottom-20 left-2 right-2 top-14 z-50 flex flex-col overflow-hidden sm:bottom-20 sm:right-auto sm:left-3 sm:top-16 sm:w-96"
+      className="room-side-panel room-drawer ftos-fade flex flex-col overflow-hidden"
       style={{
         background: 'var(--surface-panel)',
         borderColor: 'var(--surface-border)',

@@ -61,18 +61,23 @@ export default function WindowToolbar({
       </div>
       <div className="flex items-center space-x-1">
         {onMinimize && (
-          <button 
+          <button
+            type="button"
             onClick={onMinimize}
             className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
+            title="Minimize"
+            aria-label={`Minimize ${title}`}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
         )}
         {onMaximize && (
-          <button 
+          <button
+            type="button"
             onClick={onMaximize}
             className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
             title={isMaximized ? 'Restore' : 'Maximize'}
+            aria-label={`${isMaximized ? 'Restore' : 'Maximize'} ${title}`}
           >
             {isMaximized ? (
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 5V3h12v12h-2"/></svg>
@@ -81,11 +86,14 @@ export default function WindowToolbar({
             )}
           </button>
         )}
-        <button 
+        <button
+          type="button"
           onClick={onClose}
           className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-red-500/10 hover:text-red-500"
+          title="Close"
+          aria-label={`Close ${title}`}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
     </div>

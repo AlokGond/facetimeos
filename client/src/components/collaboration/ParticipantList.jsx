@@ -113,16 +113,7 @@ export default function ParticipantList({
 
   return (
     <div
-      /**
-       * `ftos-panel`, not `dark:bg-[var(--bg-card,#12121a)]`. That fallback never
-       * fired — `--bg-card` *is* defined, as a 3% white overlay — so the whole
-       * drawer was see-through and the names sat on top of live video.
-       * `h-[100dvh]` rather than `h-full`: the drawer is `fixed`, so `h-full`
-       * resolves against the viewport, and on mobile that is the tall
-       * URL-bar-hidden viewport — the bottom of the list, where the host actions
-       * are, ended up under the browser chrome.
-       */
-      className={`room-drawer fixed bottom-3 right-3 top-3 z-50 flex w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden transition-transform duration-300 ease-in-out sm:w-96 ${
+      className={`room-side-panel room-drawer flex flex-col overflow-hidden transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : 'pointer-events-none translate-x-[calc(100%+1rem)]'
       }`}
       aria-hidden={!isOpen}

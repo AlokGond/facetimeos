@@ -92,11 +92,7 @@ export default function ChatPanel({
 
   return (
     <div
-      /* On a phone the panel spans the width rather than floating in a 320px
-         column with 16px of dead space beside it, and it stops higher up: the
-         control bar wraps to two rows down there, and `bottom-24` put the message
-         composer underneath it. */
-      className="room-drawer ftos-fade fixed bottom-20 left-2 right-2 top-14 z-50 flex flex-col overflow-hidden sm:bottom-20 sm:left-auto sm:right-3 sm:top-16 sm:w-96"
+      className="room-side-panel room-drawer ftos-fade flex flex-col overflow-hidden"
       style={{
         background: 'var(--surface-panel)',
         borderColor: 'var(--surface-border)',

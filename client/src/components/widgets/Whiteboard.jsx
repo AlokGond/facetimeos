@@ -130,6 +130,7 @@ export default function Whiteboard({
   const liveRef = useRef(null);
   const drawingRef = useRef(null);
   const lastCursorSentRef = useRef(0);
+  const redoStackRef = useRef([]);
 
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [tool, setTool] = useState('pen');
@@ -137,6 +138,7 @@ export default function Whiteboard({
   const [width, setWidth] = useState(2);
   const [draft, setDraft] = useState(null); // inline text entry
   const [cursors, setCursors] = useState([]);
+  const [redoCount, setRedoCount] = useState(0);
 
   const strokes = useYArray(sharedWhiteboard);
 
@@ -236,6 +238,10 @@ export default function Whiteboard({
       sharedWhiteboard.push([
         { ...stroke, by: peerId || null, byName: displayName || null, at: Date.now() },
       ]);
+      // A new drawing starts a new history branch, so previously undone work
+      // should no longer be offered as redo.
+      redoStackRef.current = [];
+      setRedoCount(0);
       onActivity?.();
     },
     [sharedWhiteboard, readOnly, peerId, displayName, onActivity]
@@ -355,16 +361,33 @@ export default function Whiteboard({
       // whatever your colleague just finished drawing.
       if (!peerId || stroke?.by === peerId) {
         sharedWhiteboard.delete(i, 1);
+        redoStackRef.current.push(stroke);
+        setRedoCount(redoStackRef.current.length);
+        onActivity?.();
         return;
       }
     }
-  }, [sharedWhiteboard, readOnly, peerId]);
+  }, [sharedWhiteboard, readOnly, peerId, onActivity]);
+
+  const redo = useCallback(() => {
+    if (!sharedWhiteboard || readOnly) return;
+    const stroke = redoStackRef.current.pop();
+    if (!stroke) return;
+    // Re-appending is intentional: it keeps the restored stroke above anything
+    // collaborators drew while it was undone, without rewriting their history.
+    sharedWhiteboard.push([stroke]);
+    setRedoCount(redoStackRef.current.length);
+    onActivity?.();
+  }, [sharedWhiteboard, readOnly, onActivity]);
 
   const clearBoard = useCallback(() => {
     if (!sharedWhiteboard || readOnly) return;
     if (!window.confirm('Clear the whiteboard for everyone in this room?')) return;
     sharedWhiteboard.delete(0, sharedWhiteboard.length);
-  }, [sharedWhiteboard, readOnly]);
+    redoStackRef.current = [];
+    setRedoCount(0);
+    onActivity?.();
+  }, [sharedWhiteboard, readOnly, onActivity]);
 
   /** Flatten the board to a PNG. Part of what makes a room's work take-away. */
   const exportPng = useCallback(() => {
@@ -412,6 +435,33 @@ export default function Whiteboard({
               {entry.glyph}
             </button>
           ))}
+        </div>
+
+        <div className="flex gap-1 pr-2 border-r border-stone-300 dark:border-white/10">
+          <button
+            type="button"
+            onClick={undo}
+            disabled={disabled || mine === 0}
+            title="Undo your last change"
+            className="flex h-8 items-center gap-1.5 rounded px-2 text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200 disabled:opacity-40 dark:text-white/80 dark:hover:bg-white/10"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 7 4 12l5 5"/><path d="M4 12h9a7 7 0 0 1 7 7"/>
+            </svg>
+            Undo
+          </button>
+          <button
+            type="button"
+            onClick={redo}
+            disabled={disabled || redoCount === 0}
+            title="Redo your last undone change"
+            className="flex h-8 items-center gap-1.5 rounded px-2 text-xs font-medium text-stone-700 transition-colors hover:bg-stone-200 disabled:opacity-40 dark:text-white/80 dark:hover:bg-white/10"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m15 7 5 5-5 5"/><path d="M20 12h-9a7 7 0 0 0-7 7"/>
+            </svg>
+            Redo
+          </button>
         </div>
 
         <div className="flex gap-1 pr-2 border-r border-stone-300 dark:border-white/10">
@@ -464,15 +514,6 @@ export default function Whiteboard({
             className="px-2.5 py-1 rounded text-xs bg-stone-200 dark:bg-white/10 hover:bg-stone-300 dark:hover:bg-white/20 text-stone-700 dark:text-white"
           >
             PNG
-          </button>
-          <button
-            type="button"
-            onClick={undo}
-            disabled={disabled || mine === 0}
-            title="Undo your last stroke"
-            className="px-2.5 py-1 rounded text-xs bg-stone-200 dark:bg-white/10 hover:bg-stone-300 dark:hover:bg-white/20 text-stone-700 dark:text-white disabled:opacity-40"
-          >
-            Undo
           </button>
           <button
             type="button"

@@ -30,6 +30,7 @@ export default function SpatialWindow({
   onMove,
   onResize,
   onClose,
+  onMinimize,
   onFocus,
   children,
 }) {
@@ -89,6 +90,13 @@ export default function SpatialWindow({
     setIsMaximized(true);
   }, [isMaximized, position, onMove]);
 
+  const minimize = useCallback(() => {
+    // A restored window should return to its normal geometry, not unexpectedly
+    // cover the whole workspace because it was minimized while maximized.
+    if (isMaximized) setIsMaximized(false);
+    onMinimize?.(id);
+  }, [id, isMaximized, onMinimize]);
+
   if (isMinimized) return null;
 
   return (
@@ -133,6 +141,7 @@ export default function SpatialWindow({
           icon={meta.icon}
           badge={readOnly ? 'View only' : ownerLabel}
           onClose={() => onClose?.(id)}
+          onMinimize={minimize}
           onMaximize={toggleMaximize}
           isMaximized={isMaximized}
         />

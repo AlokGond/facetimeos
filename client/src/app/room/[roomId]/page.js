@@ -660,6 +660,7 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
       // room only has one. Re-opening therefore means "bring it to the front".
       const existing = windows.find((win) => win.type === type);
       if (existing) {
+        if (existing.isMinimized) patchWindow(existing.id, { isMinimized: false });
         focus(existing.id);
         return;
       }
@@ -667,7 +668,7 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
         record(TIMELINE_KINDS.widget, `${widgetMeta(type).title} opened`, { widget: type });
       }
     },
-    [canEdit, canUseTool, pendingTools, requestAccess, windows, focus, spawn, record, notify]
+    [canEdit, canUseTool, pendingTools, requestAccess, windows, patchWindow, focus, spawn, record, notify]
   );
 
   // Latest-refs, so the event handler can open or close a widget without taking
@@ -1185,6 +1186,7 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
               onMove={(position) => patchWindow(win.id, { position })}
               onResize={(position) => patchWindow(win.id, { position })}
               onClose={() => closeWindow(win.id)}
+              onMinimize={() => patchWindow(win.id, { isMinimized: true })}
               onFocus={focus}
             >
               {widgetFor(win)}
@@ -1192,6 +1194,32 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
           ))
         }
       </SpatialOverlay>
+
+      {canEdit && windows.some((win) => win.isMinimized) && (
+        <div
+          className="room-minimized-shelf fixed bottom-24 left-3 z-40 flex max-w-[calc(100vw-1.5rem)] flex-wrap items-center gap-1.5 p-1.5 sm:left-4"
+          aria-label="Minimized tools"
+        >
+          {windows.filter((win) => win.isMinimized).map((win) => {
+            const meta = widgetMeta(win.type);
+            return (
+              <button
+                key={win.id}
+                type="button"
+                onClick={() => {
+                  patchWindow(win.id, { isMinimized: false });
+                  focus(win.id);
+                }}
+                className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] px-2.5 text-xs font-semibold text-[var(--on-surface)] transition-colors hover:border-white/20 hover:bg-white/[0.1]"
+                title={`Restore ${meta.title}`}
+              >
+                <span aria-hidden="true">{meta.icon}</span>
+                <span>{meta.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <StatusBar
         roomId={roomId}
