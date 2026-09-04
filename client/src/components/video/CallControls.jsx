@@ -43,25 +43,27 @@ function Icon({ name, size = 18 }) {
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-function DockButton({ icon, label, active = false, danger = false, badge, className = '', ...props }) {
+function DockButton({ icon, label, active = false, danger = false, critical = false, badge, className = '', ...props }) {
   return (
     <button
       type="button"
-      className={`relative flex h-11 min-w-11 items-center justify-center gap-2 rounded-lg border px-3 text-[var(--on-surface)] transition-colors disabled:cursor-not-allowed disabled:opacity-40 sm:min-w-12 ${
-        danger
-          ? 'border-red-500/40 bg-red-500/15 text-red-600 hover:bg-red-500/25 dark:text-red-300'
+      className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-[10px] border text-[var(--on-surface)] transition-[background-color,border-color,color,transform] duration-150 disabled:cursor-not-allowed disabled:opacity-35 sm:h-11 sm:w-11 ${
+        critical
+          ? 'border-[#ef5358] bg-[#e5484d] text-white shadow-[0_5px_16px_rgba(229,72,77,0.28)] hover:border-[#f4666b] hover:bg-[#ed555a]'
+          : danger
+            ? 'border-red-400/20 bg-red-500/15 text-[#ff9da1] hover:border-red-400/30 hover:bg-red-500/20'
           : active
-            ? 'border-blue-500/45 bg-blue-500/15 text-blue-700 dark:text-blue-200'
-            : 'border-transparent hover:bg-[var(--bg-muted)]'
+            ? 'border-[#5689f5]/50 bg-[#315fda]/30 text-[#dce8ff]'
+            : 'border-transparent text-[#d9dee7] hover:border-white/10 hover:bg-white/[0.08] hover:text-white'
       } ${className}`}
       aria-label={label}
       title={label}
       {...props}
     >
       <Icon name={icon} />
-      <span className="hidden text-[11px] font-semibold xl:inline">{label}</span>
+      <span className="sr-only">{label}</span>
       {badge != null && (
-        <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-[var(--accent-primary)] px-1 text-[9px] font-bold text-white">
+        <span className="absolute -right-0.5 -top-1 grid h-[17px] min-w-[17px] place-items-center rounded-full border-2 border-[#151a22] bg-[#4f7fe8] px-0.5 text-[9px] font-bold leading-none text-white">
           {badge}
         </span>
       )}
@@ -104,8 +106,15 @@ export default function CallControls({
     const onDown = (event) => {
       if (!barRef.current?.contains(event.target)) setMenu(null);
     };
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setMenu(null);
+    };
     document.addEventListener('pointerdown', onDown);
-    return () => document.removeEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   }, [menu]);
 
   const widgets = [
@@ -116,13 +125,14 @@ export default function CallControls({
     { type: 'MEETING_TIMER', icon: 'timer', label: 'Meeting timer' },
   ];
 
-  const tray = 'room-drawer absolute bottom-14 z-50 p-2 text-[var(--on-surface)]';
-  const menuRow = 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors hover:bg-[var(--bg-muted)]';
+  const tray = 'room-drawer absolute bottom-[3.25rem] z-50 p-2 text-[var(--on-surface)] sm:bottom-[3.65rem]';
+  const menuRow = 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors hover:bg-white/[0.07]';
 
   return (
     <div
       ref={barRef}
-      className="control-dock ftos-rise fixed bottom-3 left-1/2 z-50 flex max-w-[calc(100vw-1rem)] -translate-x-1/2 items-center gap-1 p-1.5 sm:bottom-5 sm:gap-1.5 sm:p-2"
+      className="control-dock ftos-rise fixed bottom-3 left-1/2 z-50 flex max-w-[calc(100vw-1rem)] -translate-x-1/2 items-center gap-0.5 p-1 sm:bottom-4 sm:gap-1 sm:p-1.5"
+      aria-label="Meeting controls"
     >
       <DockButton icon={isMuted ? 'micOff' : 'mic'} label={isMuted ? 'Unmute' : 'Mute'} danger={isMuted} onClick={onToggleMic} aria-pressed={isMuted} />
       <DockButton icon={isCameraOff ? 'cameraOff' : 'camera'} label={isCameraOff ? 'Start video' : 'Stop video'} danger={isCameraOff} onClick={onToggleCamera} aria-pressed={isCameraOff} />
@@ -134,10 +144,11 @@ export default function CallControls({
           disabled={!canShareScreen}
           onClick={onToggleScreenShare}
           aria-pressed={isScreenSharing}
+          className="max-[420px]:hidden"
         />
       )}
 
-      <span className="mx-0.5 hidden h-7 w-px bg-[var(--surface-border)] sm:block" />
+      <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
 
       <div className="relative">
         <DockButton
@@ -149,7 +160,7 @@ export default function CallControls({
           aria-expanded={menu === 'widgets'}
         />
         {menu === 'widgets' && (
-          <div className={`${tray} bottom-14 left-1/2 w-56 -translate-x-1/2`}>
+          <div className={`${tray} left-0 w-56`} role="menu" aria-label="Room tools">
             <p className="px-3 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--on-surface-muted)]">Open in the room</p>
             {widgets.map((widget) => {
               const locked = canUseWidget ? !canUseWidget(widget.type) : false;
@@ -182,7 +193,7 @@ export default function CallControls({
       <div className="relative">
         <DockButton icon="more" label="More" active={menu === 'more'} onClick={() => setMenu((value) => (value === 'more' ? null : 'more'))} aria-expanded={menu === 'more'} />
         {menu === 'more' && (
-          <div className={`${tray} bottom-14 right-0 w-60`}>
+          <div className={`${tray} right-0 w-60`} role="menu" aria-label="More meeting actions">
             <div className="mb-2 grid grid-cols-6 gap-1 border-b border-[var(--surface-border)] pb-2">
               {REACTIONS.map((reaction) => (
                 <button
@@ -209,14 +220,59 @@ export default function CallControls({
         )}
       </div>
 
-      <span className="mx-0.5 hidden h-7 w-px bg-[var(--surface-border)] sm:block" />
+      <span className="mx-1 hidden h-6 w-px bg-white/10 sm:block" aria-hidden="true" />
 
-      <DockButton icon="leave" label="Leave" danger onClick={onEndCall} />
-      {isHost && onEndForAll && (
-        <button type="button" onClick={onEndForAll} className="hidden h-11 rounded-lg border border-red-600/50 bg-red-600 px-3 text-[11px] font-semibold text-white transition-colors hover:bg-red-500 md:block">
-          End for all
-        </button>
-      )}
+      <div className="relative">
+        <DockButton
+          icon="leave"
+          label={isHost && onEndForAll ? 'Leave options' : 'Leave meeting'}
+          critical
+          onClick={() => {
+            if (isHost && onEndForAll) {
+              setMenu((value) => (value === 'end' ? null : 'end'));
+              return;
+            }
+            onEndCall?.();
+          }}
+          aria-expanded={isHost && onEndForAll ? menu === 'end' : undefined}
+          aria-haspopup={isHost && onEndForAll ? 'menu' : undefined}
+        />
+        {menu === 'end' && (
+          <div className={`${tray} right-0 w-72 p-1.5`} role="menu" aria-label="Leave meeting options">
+            <button
+              type="button"
+              onClick={() => {
+                setMenu(null);
+                onEndCall?.();
+              }}
+              className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/[0.07]"
+              role="menuitem"
+            >
+              <span className="mt-0.5 text-[#d9dee7]"><Icon name="leave" size={16} /></span>
+              <span>
+                <span className="block text-xs font-semibold text-white">Leave meeting</span>
+                <span className="mt-0.5 block text-[10px] leading-relaxed text-[var(--on-surface-muted)]">The room stays open for everyone else.</span>
+              </span>
+            </button>
+            <div className="mx-2 h-px bg-white/10" />
+            <button
+              type="button"
+              onClick={() => {
+                setMenu(null);
+                onEndForAll?.();
+              }}
+              className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-red-500/10"
+              role="menuitem"
+            >
+              <span className="mt-0.5 text-[#ff8589]"><Icon name="leave" size={16} /></span>
+              <span>
+                <span className="block text-xs font-semibold text-[#ff8589]">End meeting for everyone</span>
+                <span className="mt-0.5 block text-[10px] leading-relaxed text-[var(--on-surface-muted)]">Disconnect every participant and close the room.</span>
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

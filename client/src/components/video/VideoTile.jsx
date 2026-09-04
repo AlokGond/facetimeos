@@ -23,22 +23,15 @@ const QUALITY = {
   poor: { dot: 'bg-red-500', label: 'Poor connection' },
 };
 
-/**
- * Both badges used to be dark-only (`text-amber-200` on a 20% amber wash,
- * `text-white/60`). On a light theme that is pale-on-pale and the badge simply
- * disappeared, so the Host marker — the one label in the room that carries
- * authority — was invisible for half the users. These carry an explicit pair.
- */
+/* Meeting overlays stay dark over every video, independent of the site theme. */
 const ROLE_BADGE = {
   host: {
     text: 'Host',
-    className:
-      'border-amber-600/40 bg-amber-100 text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/25 dark:text-amber-100',
+    className: 'border-amber-300/20 bg-amber-400/10 text-amber-200',
   },
   viewer: {
     text: 'Viewer',
-    className:
-      'border-stone-400/40 bg-stone-200/80 text-stone-700 dark:border-white/15 dark:bg-white/10 dark:text-white/70',
+    className: 'border-white/10 bg-white/[0.06] text-white/65',
   },
 };
 
@@ -155,10 +148,10 @@ export default function VideoTile({
 
   return (
     <div
-      className={`group relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border bg-[var(--surface-raised)] shadow-sm transition-colors duration-150 ${
+      className={`group relative flex h-full w-full items-center justify-center overflow-hidden rounded-[10px] border bg-[#11161d] shadow-sm transition-colors duration-150 ${
         isSpeaking && !isMuted
           ? 'border-emerald-400/70 shadow-[0_0_0_2px_rgba(52,211,153,0.35)]'
-          : 'border-[var(--surface-border)]'
+          : 'border-white/10'
       }`}
     >
       <TileVideo
@@ -173,8 +166,8 @@ export default function VideoTile({
       />
 
       {isCameraOff && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[var(--surface-panel)]">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--accent-soft)] text-4xl font-semibold text-[var(--accent-primary)] ring-1 ring-[var(--surface-border)]">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#11161d]">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[#1d2d47] text-4xl font-semibold text-[#9cbbff] ring-1 ring-white/10">
             {initial}
           </div>
           {/* Was `text-white/40`: white at 40% over a white light-theme panel is
@@ -187,14 +180,14 @@ export default function VideoTile({
       )}
 
       {handRaised && (
-        <div className="ftos-notice-warn absolute left-3 top-3 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
+        <div className="ftos-notice-warn absolute left-3 top-3 flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5-7a1.5 1.5 0 0 1 3 0v7-5a1.5 1.5 0 0 1 3 0v7-3a1.5 1.5 0 0 1 3 0v4c0 5-3 8-8 8h-1c-3 0-5-2-7-5l-2-3a1.7 1.7 0 0 1 2.7-2l3.3 3"/></svg>
           <span>Hand raised</span>
         </div>
       )}
 
       {isScreenShare && (
-        <div className="ftos-notice-info absolute right-3 top-3 rounded-md px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
+        <div className="ftos-notice-info absolute right-3 top-3 rounded-lg px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
           Sharing screen
         </div>
       )}
@@ -205,13 +198,14 @@ export default function VideoTile({
         </div>
       )}
 
-      <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
-        <div className="ftos-pill flex min-w-0 items-center gap-2 rounded-md border border-[var(--surface-border)] px-2.5 py-1.5">
-          <span className="truncate text-sm font-medium tracking-wide">
+      <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2">
+        <div className="room-video-label flex min-w-0 items-center gap-2 rounded-lg px-2.5 py-1.5">
+          <span className={`h-2 w-2 shrink-0 rounded-full ${q.dot}`} title={q.label} />
+          <span className="truncate text-[12px] font-semibold text-white">
             {isLocal ? 'You' : displayName || 'Participant'}
           </span>
           {badge && (
-            <span className={`rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase ${badge.className}`}>
+            <span className={`rounded-md border px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-[0.08em] ${badge.className}`}>
               {badge.text}
             </span>
           )}
@@ -225,26 +219,24 @@ export default function VideoTile({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {onTogglePin && (
-            <button
-              type="button"
-              onClick={onTogglePin}
-              className={`rounded-md border px-2 py-1 text-[10px] font-semibold transition-opacity ${
-                isPinned
-                  ? 'border-blue-500 bg-blue-600 text-white'
-                  : 'ftos-pill border-[var(--surface-border)] opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
-              }`}
-              title={isPinned ? 'Unpin' : 'Pin this tile'}
-            >
-              {isPinned ? 'Pinned' : 'Pin'}
-            </button>
-          )}
-          <div
-            className={`h-3 w-3 rounded-full ${q.dot} shadow-[0_0_8px_rgba(0,0,0,0.25)]`}
-            title={q.label}
-          />
-        </div>
+        {onTogglePin && (
+          <button
+            type="button"
+            onClick={onTogglePin}
+            className={`room-video-action grid h-9 w-9 place-items-center rounded-lg transition-[opacity,background-color,border-color] ${
+              isPinned
+                ? 'opacity-100'
+                : 'text-white/75 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100'
+            }`}
+            title={isPinned ? 'Unpin tile' : 'Pin tile'}
+            aria-label={isPinned ? 'Unpin tile' : 'Pin tile'}
+            aria-pressed={isPinned}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="m9 3 6 6"/><path d="m12 6 4-4 6 6-4 4"/><path d="m8 10-5 5 6 6 5-5"/><path d="m2 22 6-6"/>
+            </svg>
+          </button>
+        )}
       </div>
     </div>
   );

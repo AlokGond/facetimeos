@@ -327,7 +327,7 @@ function EndedScreen({ reason, by, onExport, onHome, onRejoin }) {
   );
 }
 
-/** The strip along the top: who you are, whether the room is healthy. */
+/** Compact meeting identity and connection state, anchored away from the speaker. */
 function StatusBar({
   roomId,
   title,
@@ -340,60 +340,59 @@ function StatusBar({
   savedNote,
   onShareLink,
 }) {
-  /**
-   * Every segment past the room name is progressively dropped on a narrow
-   * screen. The bar is `overflow-hidden`, so without this the phone layout kept
-   * the least useful things (a "here" suffix, the word "Live") and clipped the
-   * Share button, which is the only thing in here anyone taps.
-   */
   return (
-    <div className="room-statusbar pointer-events-auto absolute left-1/2 top-3 z-40 flex max-w-[94vw] -translate-x-1/2 items-center gap-1.5 overflow-hidden px-2.5 py-1.5 text-[11px] font-medium sm:top-4 sm:gap-2.5 sm:px-3">
-      <span className="max-w-[8rem] truncate font-semibold sm:max-w-none">
-        {title || `Room ${String(roomId).slice(0, 8)}`}
+    <div className="room-statusbar pointer-events-auto absolute left-3 top-3 z-40 flex max-w-[calc(100vw-1.5rem)] items-center gap-2 p-1.5 pr-2 text-[11px] sm:left-4 sm:top-4 sm:gap-2.5 sm:pr-2.5">
+      <span className="room-call-mark grid h-8 w-8 shrink-0 place-items-center rounded-lg" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="5" width="13" height="14" rx="2" />
+          <path d="m16 10 5-3v10l-5-3" />
+        </svg>
       </span>
-      <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
-      <span className="shrink-0">
-        {participantCount}
-        <span className="hidden sm:inline"> here</span>
+
+      <span className="min-w-0">
+        <span className="block max-w-[9.5rem] truncate text-[12px] font-semibold leading-tight text-white sm:max-w-[15rem]">
+          {title || `Room ${String(roomId).slice(0, 8)}`}
+        </span>
+        <span className="mt-1 flex items-center gap-1.5 text-[10px] leading-none text-[var(--on-surface-muted)]">
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-emerald-400' : 'animate-pulse bg-amber-400'}`}
+          />
+          <span title={transportNote || undefined}>{connected ? 'Live' : 'Connecting…'}</span>
+          <span aria-hidden="true">·</span>
+          <span>{participantCount} {participantCount === 1 ? 'participant' : 'participants'}</span>
+        </span>
       </span>
 
       {isHost ? (
-        <span className="shrink-0 rounded border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+        <span className="hidden shrink-0 rounded-md border border-amber-300/20 bg-amber-400/10 px-1.5 py-1 text-[9px] font-bold uppercase tracking-[0.08em] text-amber-200 sm:inline">
           Host
         </span>
       ) : role === 'viewer' ? (
-        <span className="shrink-0 rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide">
+        <span className="hidden shrink-0 rounded-md border border-white/10 bg-white/[0.06] px-1.5 py-1 text-[9px] font-bold uppercase tracking-[0.08em] text-white/70 sm:inline">
           View only
         </span>
       ) : null}
 
       {locked && (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-label="Room locked"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        <span className="hidden text-white/55 sm:inline" title="Room locked">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-label="Room locked"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        </span>
       )}
 
-      <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
-      <span className="flex shrink-0 items-center gap-1.5" title={transportNote || undefined}>
-        <span
-          className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'animate-pulse bg-amber-500'}`}
-        />
-        <span className="hidden sm:inline">{connected ? 'Live' : 'Connecting…'}</span>
-      </span>
-
       {savedNote && (
-        <>
-          <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
-          <span className="hidden shrink-0 text-emerald-600 sm:inline dark:text-emerald-400">
-            {savedNote}
-          </span>
-        </>
+        <span className="hidden shrink-0 text-emerald-300 lg:inline">{savedNote}</span>
       )}
 
       <button
         type="button"
         onClick={onShareLink}
-        className="ml-1 shrink-0 rounded-md border border-[var(--surface-border)] bg-[var(--surface-raised)] px-2 py-1 font-semibold transition-colors hover:bg-[var(--bg-muted)]"
+        className="ml-0.5 flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.07] px-2 text-[10px] font-semibold text-white transition-colors hover:border-white/20 hover:bg-white/[0.11] sm:px-2.5"
+        aria-label="Copy meeting invite link"
       >
-        Share
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"/>
+        </svg>
+        <span className="hidden sm:inline">Invite</span>
       </button>
     </div>
   );
