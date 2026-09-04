@@ -10,7 +10,7 @@ export default function Button({
   disabled = false,
   ...props
 }) {
-  const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "inline-flex items-center justify-center rounded-[0.65rem] font-semibold transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)] disabled:opacity-50 disabled:cursor-not-allowed";
 
   /**
    * `--accent-gradient` was never defined in globals.css, so `primary` resolved
@@ -19,7 +19,7 @@ export default function Button({
    * theme. All four variants now use tokens that exist in both themes.
    */
   const variants = {
-    primary: "bg-[var(--accent-primary)] hover:brightness-110 text-white border-none shadow-[0_0_15px_var(--glow-primary)] focus:ring-[var(--accent-primary)]",
+    primary: "bg-[var(--accent-primary-strong)] hover:bg-[var(--accent-primary)] text-white border border-[var(--accent-primary-strong)]",
     secondary: "bg-[var(--surface-raised)] border border-[var(--surface-border)] text-[var(--on-surface)] hover:bg-[var(--bg-muted)] focus:ring-[var(--accent-primary)]",
     ghost: "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-muted)] border-transparent focus:ring-[var(--accent-primary)]",
     danger: "bg-red-500/10 border border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-500 hover:text-white focus:ring-red-500",

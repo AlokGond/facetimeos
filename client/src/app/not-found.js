@@ -11,7 +11,7 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[var(--bg-primary)] p-6 text-[var(--text-primary)]">
-      <div className="ftos-panel w-full max-w-md rounded-2xl border p-7 shadow-2xl">
+      <div className="ftos-panel w-full max-w-md rounded-xl border p-7 shadow-2xl">
         <h1 className="mb-2 text-lg font-semibold">There is nothing at this address</h1>
         <p className="ftos-muted mb-5 text-sm leading-relaxed">
           Room links look like <span className="font-mono text-[11px]">/room/</span> followed by a
@@ -20,7 +20,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
-          className="block w-full rounded-xl bg-[var(--accent-primary)] px-4 py-2.5 text-center text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="primary-action w-full"
         >
           Start a room instead
         </Link>

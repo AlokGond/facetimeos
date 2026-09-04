@@ -73,43 +73,43 @@ export default function AuthModal({ isOpen, onClose, onSuccess, reason }) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in"
-      style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }}
+      className="dialog-backdrop fixed inset-0 z-[200] flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-dialog-title"
     >
       <div
-        className="w-full max-w-md relative rounded-2xl p-8 animate-scale-in"
-        style={{
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-        }}
+        className="dialog-surface relative w-full max-w-[28rem] p-6 animate-scale-in sm:p-7"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-          style={{ color: 'var(--text-muted)' }}
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+          aria-label="Close sign-in dialog"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
 
-        <h3 className="text-xl font-bold mb-1 tracking-tight" style={{ color: 'var(--text-primary)' }}>
-          {!authAvailable ? 'Sign-in needs Firebase keys' : isLogin ? 'Welcome back' : 'Create account'}
-        </h3>
-        <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
+        <div className="mb-6 pr-8">
+          <p className="eyebrow mb-4">Account</p>
+          <h2 id="auth-dialog-title" className="text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)]">
+            {!authAvailable ? 'Sign-in is not configured' : isLogin ? 'Sign in to continue' : 'Create your account'}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">
           {!authAvailable
-            ? 'This build has no auth project wired up, so the requirement is switched off.'
+            ? 'This build can still open rooms, but account sign-in is currently unavailable.'
             : reason
               ? reason
               : isLogin
-                ? 'Sign in to your FaceTimeOS account.'
-                : 'Get started with FaceTimeOS.'}
-        </p>
+                ? 'Use the account connected to your rooms.'
+                : 'Your name is shown to other people in the room.'}
+          </p>
+        </div>
 
         {!authAvailable ? (
           <>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+            <p className="mb-4 text-sm leading-6 text-[var(--text-secondary)]">
               An account is meant to be required before you create or join a room —
               but a requirement nobody can satisfy is just a locked door, so rooms
               keep working here: the server issues your identity when you join. To
@@ -118,7 +118,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, reason }) {
               <code>next dev</code>:
             </p>
             <pre
-              className="mb-6 overflow-x-auto rounded-xl p-3 text-[11px] leading-relaxed"
+              className="mb-6 overflow-x-auto rounded-md p-3 font-mono text-[11px] leading-relaxed"
               style={{
                 background: 'var(--bg-input)',
                 border: '1px solid var(--bg-input-border)',
@@ -133,18 +133,17 @@ NEXT_PUBLIC_FIREBASE_APP_ID=…`}
             <button
               type="button"
               onClick={onClose}
-              className="gradient-btn w-full py-3 rounded-xl font-semibold text-sm text-white"
+              className="primary-action w-full"
             >
               Continue without an account
             </button>
           </>
         ) : (
           <>
-        {/* Google Sign-In Button */}
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 mb-4 disabled:opacity-50"
+          className="secondary-action mb-4 w-full disabled:opacity-50"
           style={{
             background: 'var(--bg-input)',
             border: '1px solid var(--bg-input-border)',
@@ -160,7 +159,6 @@ NEXT_PUBLIC_FIREBASE_APP_ID=…`}
           Continue with Google
         </button>
 
-        {/* Divider */}
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 h-px" style={{ background: 'var(--border-subtle)' }} />
           <span className="text-xs" style={{ color: 'var(--text-muted)' }}>or</span>
@@ -168,7 +166,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=…`}
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.15)', color: '#ef4444' }}>
+          <div className="mb-4 rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-300" role="alert">
             {error}
           </div>
         )}
@@ -176,53 +174,41 @@ NEXT_PUBLIC_FIREBASE_APP_ID=…`}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {!isLogin && (
             <div>
-              <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Display Name</label>
+              <label htmlFor="auth-name" className="field-label">Your name</label>
               <input
+                id="auth-name"
                 type="text"
                 required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
-                style={{
-                  background: 'var(--bg-input)',
-                  border: '1px solid var(--bg-input-border)',
-                  color: 'var(--text-primary)',
-                }}
-                placeholder="Your name"
+                className="field-input"
+                placeholder="How others will see you"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email</label>
+            <label htmlFor="auth-email" className="field-label">Email</label>
             <input
+              id="auth-email"
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
-              style={{
-                background: 'var(--bg-input)',
-                border: '1px solid var(--bg-input-border)',
-                color: 'var(--text-primary)',
-              }}
+              className="field-input"
               placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Password</label>
+            <label htmlFor="auth-password" className="field-label">Password</label>
             <input
+              id="auth-password"
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all"
-              style={{
-                background: 'var(--bg-input)',
-                border: '1px solid var(--bg-input-border)',
-                color: 'var(--text-primary)',
-              }}
+              className="field-input"
               placeholder="••••••••"
               minLength={6}
             />
@@ -231,19 +217,18 @@ NEXT_PUBLIC_FIREBASE_APP_ID=…`}
           <button
             type="submit"
             disabled={loading}
-            className="gradient-btn w-full py-3 rounded-xl font-semibold text-sm text-white mt-1 disabled:opacity-50"
+            className="primary-action mt-1 w-full disabled:opacity-50"
           >
-            {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? 'Working…' : isLogin ? 'Sign in' : 'Create account'}
           </button>
         </form>
 
-        <p className="mt-5 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+        <p className="mt-5 text-center text-sm text-[var(--text-muted)]">
           {isLogin ? "Don't have an account? " : 'Already have an account? '}
           <button
             type="button"
             onClick={() => { setIsLogin(!isLogin); setError(''); }}
-            className="font-medium"
-            style={{ color: 'var(--accent-primary)' }}
+            className="font-semibold text-[var(--accent-primary)] hover:underline"
           >
             {isLogin ? 'Sign up' : 'Sign in'}
           </button>

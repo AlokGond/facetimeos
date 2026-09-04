@@ -24,7 +24,7 @@ export default function RoomError({ error }) {
 
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[var(--bg-base)] p-6 text-[var(--on-surface)]">
-      <div className="ftos-panel w-full max-w-md rounded-2xl border p-7 shadow-2xl">
+      <div className="ftos-panel w-full max-w-md rounded-xl border p-7 shadow-2xl">
         <h1 className="mb-2 text-lg font-semibold">The call window crashed</h1>
         <p className="ftos-muted mb-5 text-sm leading-relaxed">
           The room is still open and everyone else is still in it. Rejoining restores your place —
@@ -40,7 +40,7 @@ export default function RoomError({ error }) {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="w-full rounded-xl bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="primary-action w-full"
           >
             Rejoin the room
           </button>
@@ -53,7 +53,7 @@ export default function RoomError({ error }) {
                do it, which is the whole point here. */
             // eslint-disable-next-line @next/next/no-location-assign-relative-destination
             onClick={() => window.location.assign('/')}
-            className="w-full rounded-xl border border-[var(--surface-border)] px-4 py-2.5 text-center text-sm font-medium transition-colors hover:bg-[var(--bg-muted)]"
+            className="secondary-action w-full border-[var(--surface-border)] bg-[var(--surface-raised)] text-[var(--on-surface)]"
           >
             Leave the call
           </button>

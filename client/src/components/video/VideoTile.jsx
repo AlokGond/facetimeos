@@ -108,7 +108,7 @@ function TileVideo({ stream, isLocal, isScreenShare, isHidden, initial }) {
 
       {stalled && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[var(--surface-panel)] px-6 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent-primary)] text-3xl font-semibold text-white shadow-lg">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent-soft)] text-3xl font-semibold text-[var(--accent-primary)] ring-1 ring-[var(--surface-border)]">
             {initial}
           </div>
           {state === 'blocked' ? (
@@ -155,7 +155,7 @@ export default function VideoTile({
 
   return (
     <div
-      className={`group relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border bg-[var(--surface-raised)] shadow-lg transition-colors duration-150 ${
+      className={`group relative flex h-full w-full items-center justify-center overflow-hidden rounded-xl border bg-[var(--surface-raised)] shadow-sm transition-colors duration-150 ${
         isSpeaking && !isMuted
           ? 'border-emerald-400/70 shadow-[0_0_0_2px_rgba(52,211,153,0.35)]'
           : 'border-[var(--surface-border)]'
@@ -174,7 +174,7 @@ export default function VideoTile({
 
       {isCameraOff && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[var(--surface-panel)]">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--accent-primary)] text-4xl font-semibold text-white shadow-lg">
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-[var(--accent-soft)] text-4xl font-semibold text-[var(--accent-primary)] ring-1 ring-[var(--surface-border)]">
             {initial}
           </div>
           {/* Was `text-white/40`: white at 40% over a white light-theme panel is
@@ -187,14 +187,14 @@ export default function VideoTile({
       )}
 
       {handRaised && (
-        <div className="ftos-notice-warn absolute left-4 top-4 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
-          <span>🖐️</span>
+        <div className="ftos-notice-warn absolute left-3 top-3 flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M8 11V5a1.5 1.5 0 0 1 3 0v5-7a1.5 1.5 0 0 1 3 0v7-5a1.5 1.5 0 0 1 3 0v7-3a1.5 1.5 0 0 1 3 0v4c0 5-3 8-8 8h-1c-3 0-5-2-7-5l-2-3a1.7 1.7 0 0 1 2.7-2l3.3 3"/></svg>
           <span>Hand raised</span>
         </div>
       )}
 
       {isScreenShare && (
-        <div className="ftos-notice-info absolute right-4 top-4 rounded-full px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
+        <div className="ftos-notice-info absolute right-3 top-3 rounded-md px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
           Sharing screen
         </div>
       )}
@@ -205,8 +205,8 @@ export default function VideoTile({
         </div>
       )}
 
-      <div className="absolute inset-x-4 bottom-4 flex items-center justify-between gap-2">
-        <div className="ftos-pill flex min-w-0 items-center gap-2 rounded-full px-3 py-1.5">
+      <div className="absolute inset-x-3 bottom-3 flex items-center justify-between gap-2">
+        <div className="ftos-pill flex min-w-0 items-center gap-2 rounded-md border border-[var(--surface-border)] px-2.5 py-1.5">
           <span className="truncate text-sm font-medium tracking-wide">
             {isLocal ? 'You' : displayName || 'Participant'}
           </span>
@@ -217,10 +217,10 @@ export default function VideoTile({
           )}
           {isMuted && (
             <span
-              className="text-sm text-red-500 dark:text-red-400"
+              className="text-red-500 dark:text-red-400"
               title={mutedByHost ? 'Muted by the host' : 'Microphone off'}
             >
-              🔇
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m3 3 18 18M9 9v3a3 3 0 0 0 5.1 2.1M15 10V5a3 3 0 0 0-5.7-1.3M17.4 17.4A7 7 0 0 1 5 12v-2M19 10v2c0 .7-.1 1.4-.3 2M12 19v3"/></svg>
             </span>
           )}
         </div>
@@ -230,14 +230,14 @@ export default function VideoTile({
             <button
               type="button"
               onClick={onTogglePin}
-              className={`rounded-full px-2 py-1 text-[10px] font-semibold transition-opacity ${
+              className={`rounded-md border px-2 py-1 text-[10px] font-semibold transition-opacity ${
                 isPinned
-                  ? 'bg-indigo-500 text-white'
-                  : 'ftos-pill opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                  ? 'border-blue-500 bg-blue-600 text-white'
+                  : 'ftos-pill border-[var(--surface-border)] opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
               }`}
               title={isPinned ? 'Unpin' : 'Pin this tile'}
             >
-              {isPinned ? '📌 Pinned' : '📌 Pin'}
+              {isPinned ? 'Pinned' : 'Pin'}
             </button>
           )}
           <div

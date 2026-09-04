@@ -28,7 +28,7 @@ export default function Error({ error, reset }) {
 
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center bg-[var(--bg-primary)] p-6 text-[var(--text-primary)]">
-      <div className="ftos-panel w-full max-w-md rounded-2xl border p-7 shadow-2xl">
+      <div className="ftos-panel w-full max-w-md rounded-xl border p-7 shadow-2xl">
         <h1 className="mb-2 text-lg font-semibold">Something broke on this page</h1>
         <p className="ftos-muted mb-5 text-sm leading-relaxed">
           Not your fault, and nothing you had open is lost — anything shared in a room lives in
@@ -43,13 +43,13 @@ export default function Error({ error, reset }) {
           <button
             type="button"
             onClick={reset}
-            className="w-full rounded-xl bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="primary-action w-full"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="w-full rounded-xl border border-[var(--surface-border)] px-4 py-2.5 text-center text-sm font-medium text-[var(--on-surface)] transition-colors hover:bg-[var(--bg-muted)]"
+            className="secondary-action w-full border-[var(--surface-border)] bg-[var(--surface-raised)] text-[var(--on-surface)]"
           >
             Back to the home page
           </Link>

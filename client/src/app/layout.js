@@ -1,29 +1,27 @@
-import { Libre_Baskerville, DM_Sans } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 
-const heading = Libre_Baskerville({
-  subsets: ['latin'],
-  variable: '--font-heading',
-  weight: ['400', '700'],
-});
-
-const body = DM_Sans({
+const body = Geist({
   subsets: ['latin'],
   variable: '--font-body',
-  weight: ['300', '400', '500', '600'],
+});
+
+const mono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
 });
 
 export const metadata = {
-  title: 'FaceTimeOS — Spatial Collaboration',
-  description: 'Embed code editors, whiteboards, and notes directly inside your video call. Zero servers. Peer-to-peer.',
+  title: 'FaceTimeOS — The call where the work stays open',
+  description: 'A shared room for video, code, whiteboards, notes, and decisions that stay there when the call ends.',
   keywords: 'webrtc, collaboration, video call, spatial, code editor, whiteboard, peer-to-peer',
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${heading.variable} ${body.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${body.variable} ${mono.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col transition-colors duration-300" style={{ fontFamily: 'var(--font-body)' }}>
         <ThemeProvider>
           <AuthProvider>

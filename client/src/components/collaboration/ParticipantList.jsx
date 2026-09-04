@@ -39,7 +39,7 @@ const TOOL_LABEL = { whiteboard: 'Whiteboard', code: 'Code editor' };
 
 function Row({ children }) {
   return (
-    <div className="ftos-raised flex items-center justify-between gap-2 rounded-xl border p-3 transition-colors hover:border-[var(--border-hover)]">
+    <div className="flex items-center justify-between gap-2 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-raised)] p-3 transition-colors hover:border-[var(--border-hover)]">
       {children}
     </div>
   );
@@ -122,17 +122,15 @@ export default function ParticipantList({
        * URL-bar-hidden viewport — the bottom of the list, where the host actions
        * are, ended up under the browser chrome.
        */
-      className={`ftos-panel fixed right-0 top-0 z-50 flex h-[100dvh] w-[85vw] max-w-sm flex-col border-l shadow-2xl transition-transform duration-300 ease-in-out sm:w-96 sm:max-w-none ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
+      className={`room-drawer fixed bottom-3 right-3 top-3 z-50 flex w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden transition-transform duration-300 ease-in-out sm:w-96 ${
+        isOpen ? 'translate-x-0' : 'pointer-events-none translate-x-[calc(100%+1rem)]'
       }`}
       aria-hidden={!isOpen}
     >
-      <div className="ftos-raised flex items-center justify-between border-b p-4">
+      <div className="flex items-center justify-between border-b border-[var(--surface-border)] bg-[var(--surface-raised)] px-4 py-3">
         <div className="flex items-center gap-2">
-          <h2 className="text-sm font-semibold text-[var(--on-surface)]">Participants</h2>
-          <span className="rounded-full border border-blue-500/30 bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-200">
-            {list.length + 1}
-          </span>
+          <h2 className="text-sm font-semibold tracking-[-0.01em] text-[var(--on-surface)]">People</h2>
+          <span className="text-xs text-[var(--on-surface-muted)]">{list.length + 1} here</span>
         </div>
         <button
           type="button"
@@ -140,7 +138,7 @@ export default function ParticipantList({
           className="rounded-lg p-1 text-xs text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
           aria-label="Close participants"
         >
-          ✕
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
         </button>
       </div>
 
@@ -162,7 +160,7 @@ export default function ParticipantList({
                 : 'Lock the room so new joiners need your approval'
             }
           >
-            {locked ? '🔒 Locked' : '🔓 Open'}
+            {locked ? 'Locked' : 'Open'}
           </button>
         </div>
       )}
@@ -281,7 +279,7 @@ export default function ParticipantList({
               )}
               {localHandRaised && (
                 <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-300">
-                  🖐️ Your hand is raised
+                  Your hand is raised
                 </span>
               )}
             </div>
@@ -310,12 +308,12 @@ export default function ParticipantList({
                   <div className="flex min-w-0 flex-col gap-0.5">
                     <span className="flex items-center gap-1.5 truncate text-xs font-medium text-[var(--on-surface)]">
                       {peer.displayName || 'Participant'}
-                      {muted && <span title="Microphone off">🔇</span>}
-                      {peer.media?.screen && <span title="Sharing screen">🖥️</span>}
+                      {muted && <span className="text-[10px] text-[var(--on-surface-muted)]">Muted</span>}
+                      {peer.media?.screen && <span className="text-[10px] text-blue-600 dark:text-blue-300">Sharing</span>}
                     </span>
                     {peer.handRaised && (
                       <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-300">
-                        🖐️ Raised hand
+                        Hand raised
                       </span>
                     )}
                     {note && (
@@ -378,7 +376,7 @@ export default function ParticipantList({
                               }`}
                               title={`${allowed ? 'Revoke' : 'Allow'} ${label} access`}
                             >
-                              {tool === 'whiteboard' ? '🎨' : '⌨️'}
+                              {tool === 'whiteboard' ? 'Board' : 'Code'}
                             </button>
                           );
                         })}
@@ -392,7 +390,7 @@ export default function ParticipantList({
                         // is not a feature.
                         title="Ask this person's browser to mute (they choose when to unmute)"
                       >
-                        🔇
+                        Mute
                       </button>
                       <button
                         type="button"
@@ -401,7 +399,7 @@ export default function ParticipantList({
                         className={`${hostBtn} border-red-600/40 bg-red-600/15 text-red-800 dark:text-red-300`}
                         title="Remove from the room"
                       >
-                        🚪
+                        Remove
                       </button>
                     </>
                   )}

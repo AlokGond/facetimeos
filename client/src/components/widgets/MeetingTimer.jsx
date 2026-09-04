@@ -155,19 +155,19 @@ export default function MeetingTimer({ meta, displayName, readOnly = false, onAc
     timer.mode === 'countdown' && timer.duration > 0
       ? Math.min(1, Math.max(0, value / timer.duration))
       : 0;
-  const tone = overrun ? 'text-red-400' : fraction > 0 && fraction < 0.1 ? 'text-amber-300' : 'text-white';
+  const tone = overrun ? 'text-red-500' : fraction > 0 && fraction < 0.1 ? 'text-amber-500' : 'text-[var(--on-surface)]';
 
   return (
-    <div className="flex h-full w-full select-none flex-col items-center justify-between rounded-xl border border-white/10 bg-[#0f0f17] p-5 font-sans text-white">
-      <div className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-[#181824] p-1 text-xs">
+    <div className="flex h-full w-full select-none flex-col items-center justify-between bg-[var(--surface-panel)] p-5 font-sans text-[var(--on-surface)]">
+      <div className="flex items-center gap-1 rounded-lg border border-[var(--surface-border)] bg-[var(--surface-raised)] p-1 text-xs">
         {['countdown', 'stopwatch'].map((mode) => (
           <button
             key={mode}
             type="button"
             onClick={() => switchMode(mode)}
             disabled={readOnly}
-            className={`rounded-lg px-3 py-1.5 font-semibold capitalize transition-colors disabled:opacity-40 ${
-              timer.mode === mode ? 'bg-blue-600 text-white shadow' : 'text-white/60 hover:text-white'
+            className={`rounded-md px-3 py-1.5 font-semibold capitalize transition-colors disabled:opacity-40 ${
+              timer.mode === mode ? 'bg-[var(--accent-primary-strong)] text-white' : 'text-[var(--on-surface-muted)] hover:text-[var(--on-surface)]'
             }`}
           >
             {mode}
@@ -184,18 +184,18 @@ export default function MeetingTimer({ meta, displayName, readOnly = false, onAc
           {overrun ? '−' : ''}
           {format(value)}
         </div>
-        <p className="mt-2.5 text-xs font-medium text-white/50">
+        <p className="mt-2.5 text-[13px] font-medium text-[var(--on-surface-muted)]">
           {timer.mode === 'stopwatch'
             ? 'Elapsed meeting time'
             : overrun
-              ? '⏰ Over time'
+              ? 'Over time'
               : running
                 ? 'Remaining'
                 : 'Paused'}
         </p>
 
         {timer.mode === 'countdown' && timer.duration > 0 && (
-          <div className="mx-auto mt-4 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10">
+          <div className="mx-auto mt-4 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-[var(--surface-raised)]">
             <div
               className={`h-full rounded-full transition-[width] duration-200 ${
                 overrun ? 'bg-red-500' : fraction < 0.1 ? 'bg-amber-400' : 'bg-blue-500'
@@ -214,10 +214,10 @@ export default function MeetingTimer({ meta, displayName, readOnly = false, onAc
               type="button"
               onClick={() => setPreset(minutes)}
               disabled={readOnly}
-              className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-40 ${
+            className={`rounded-md border px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-40 ${
                 timer.duration === minutes * 60_000
-                  ? 'border-blue-500/40 bg-blue-500/20 text-blue-200'
-                  : 'border-white/5 bg-white/5 text-white/80 hover:bg-white/15'
+                  ? 'border-blue-500/40 bg-blue-500/15 text-blue-600 dark:text-blue-200'
+                  : 'border-[var(--surface-border)] bg-[var(--surface-raised)] text-[var(--on-surface-muted)] hover:text-[var(--on-surface)]'
               }`}
             >
               {minutes}m
@@ -231,25 +231,25 @@ export default function MeetingTimer({ meta, displayName, readOnly = false, onAc
           type="button"
           onClick={toggle}
           disabled={readOnly}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-semibold transition-colors disabled:opacity-40 ${
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-semibold transition-colors disabled:opacity-40 ${
             running
               ? 'border border-amber-500/30 bg-amber-500/20 text-amber-300 hover:bg-amber-500/30'
               : 'bg-blue-600 text-white shadow-md hover:bg-blue-500'
           }`}
         >
-          <span>{running ? '⏸ Pause' : expired ? '↻ Restart' : '▶ Start'}</span>
+          <span>{running ? 'Pause' : expired ? 'Restart' : 'Start'}</span>
         </button>
         <button
           type="button"
           onClick={reset}
           disabled={readOnly}
-          className="rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 text-xs font-semibold text-white/80 transition-colors hover:bg-white/20 disabled:opacity-40"
+          className="rounded-lg border border-[var(--surface-border)] bg-[var(--surface-raised)] px-4 py-2.5 text-xs font-semibold text-[var(--on-surface)] transition-colors hover:bg-[var(--bg-muted)] disabled:opacity-40"
         >
-          🔄 Reset
+          Reset
         </button>
       </div>
 
-      <p className="mt-3 text-center text-[10px] text-white/60">
+      <p className="mt-3 text-center text-xs text-[var(--on-surface-muted)]">
         {meta ? 'Synced from a shared deadline — survives a reload' : 'Local only — no room document'}
         {timer.by ? ` · last set by ${timer.by}` : ''}
         {readOnly && <span className="ml-1 font-semibold text-amber-400">· view only</span>}

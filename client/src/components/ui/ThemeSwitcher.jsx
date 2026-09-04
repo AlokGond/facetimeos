@@ -40,7 +40,7 @@ export default function ThemeSwitcher() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent transition-colors hover:border-[var(--border-subtle)] hover:bg-[var(--bg-muted)]"
         style={{ color: 'var(--text-secondary)', background: isOpen ? 'var(--bg-input)' : 'transparent' }}
         title={`Theme: ${current?.label}`}
         aria-label={`Theme: ${current?.label}`}
@@ -53,11 +53,11 @@ export default function ThemeSwitcher() {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full mt-2 rounded-xl overflow-hidden py-1 min-w-[140px] animate-scale-in z-50"
+          className="absolute right-0 top-full z-50 mt-2 min-w-[150px] overflow-hidden rounded-lg py-1.5 animate-scale-in"
           style={{
             background: 'var(--surface-panel)',
             border: '1px solid var(--surface-border)',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
+            boxShadow: '0 18px 44px rgba(0,0,0,0.22)',
           }}
         >
           {options.map((opt) => (
@@ -66,7 +66,7 @@ export default function ThemeSwitcher() {
               role="menuitemradio"
               aria-checked={theme === opt.value}
               onClick={() => { setTheme(opt.value); setIsOpen(false); }}
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors text-left"
+              className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[13px] font-medium transition-colors"
               style={{
                 color: theme === opt.value ? 'var(--accent-primary)' : 'var(--text-secondary)',
                 // `--bg-card` is a 3% white overlay in dark mode, so the selected

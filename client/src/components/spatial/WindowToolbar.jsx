@@ -45,16 +45,16 @@ export default function WindowToolbar({
   };
 
   return (
-    <div className="window-drag-handle flex items-center justify-between px-4 py-2.5 bg-black/40 dark:bg-black/50 backdrop-blur-md cursor-move select-none border-b border-stone-200/50 dark:border-white/10 shrink-0">
+    <div className="window-drag-handle flex shrink-0 cursor-move select-none items-center justify-between border-b border-[var(--surface-border)] bg-[var(--surface-raised)] px-3 py-2">
       <div className="flex items-center space-x-2.5 min-w-0">
-        <span className="text-stone-600 dark:text-white/70 shrink-0">
+        <span className="shrink-0 text-[var(--on-surface-muted)]">
           {typeIcons[type] || <span aria-hidden="true">{icon || '🪟'}</span>}
         </span>
-        <span className="text-sm font-semibold text-stone-800 dark:text-white/90 tracking-wide truncate">
+        <span className="truncate text-[13px] font-semibold text-[var(--on-surface)]">
           {title}
         </span>
         {badge && (
-          <span className="shrink-0 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-stone-200/70 dark:bg-white/10 text-stone-600 dark:text-white/60">
+          <span className="shrink-0 rounded border border-[var(--surface-border)] bg-[var(--bg-muted)] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[var(--on-surface-muted)]">
             {badge}
           </span>
         )}
@@ -63,7 +63,7 @@ export default function WindowToolbar({
         {onMinimize && (
           <button 
             onClick={onMinimize}
-            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-200 dark:hover:bg-white/10 text-stone-500 dark:text-white/50 hover:text-stone-800 dark:hover:text-white transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </button>
@@ -71,7 +71,7 @@ export default function WindowToolbar({
         {onMaximize && (
           <button 
             onClick={onMaximize}
-            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-stone-200 dark:hover:bg-white/10 text-stone-500 dark:text-white/50 hover:text-stone-800 dark:hover:text-white transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
             title={isMaximized ? 'Restore' : 'Maximize'}
           >
             {isMaximized ? (
@@ -83,7 +83,7 @@ export default function WindowToolbar({
         )}
         <button 
           onClick={onClose}
-          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 text-stone-500 dark:text-white/50 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+          className="flex h-7 w-7 items-center justify-center rounded-md text-[var(--on-surface-muted)] transition-colors hover:bg-red-500/10 hover:text-red-500"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>

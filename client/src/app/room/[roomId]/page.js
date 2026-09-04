@@ -81,12 +81,12 @@ const TOOL_LABEL = Object.freeze({ whiteboard: 'whiteboard', code: 'code editor'
  * includes the scrollbar gutter and produces a sideways scroll.
  */
 const shell =
-  'flex min-h-[100dvh] w-full items-center justify-center bg-[var(--bg-base)] p-4 text-[var(--on-surface)] sm:p-6';
+  'room-shell flex min-h-[100dvh] w-full items-center justify-center p-4 text-[var(--on-surface)] sm:p-6';
 
 /* `ftos-panel`, not `dark:bg-[var(--bg-card,#12121a)]` — the fallback in that
    arbitrary value never applied, because `--bg-card` is defined (as a 3% white
    overlay), so the join/waiting/kicked cards were transparent in dark mode. */
-const card = 'ftos-panel w-full max-w-md rounded-2xl border p-7 shadow-2xl';
+const card = 'ftos-panel w-full max-w-md rounded-xl border p-6 shadow-2xl sm:p-7';
 
 /**
  * Screens shown before, and instead of, the call itself. All three are here
@@ -97,7 +97,13 @@ function Panel({ title, children }) {
   return (
     <div className={shell}>
       <div className={card}>
-        <h1 className="mb-2 text-lg font-semibold">{title}</h1>
+        <div className="mb-6 flex items-center gap-3 border-b border-[var(--surface-border)] pb-4">
+          <span className="brand-mark shrink-0" aria-hidden="true" />
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--on-surface-muted)]">FaceTimeOS</p>
+            <h1 className="mt-0.5 text-lg font-semibold tracking-[-0.025em]">{title}</h1>
+          </div>
+        </div>
         {children}
       </div>
     </div>
@@ -108,8 +114,8 @@ function Spinner({ label }) {
   return (
     <div className={shell}>
       <div className="flex flex-col items-center gap-3">
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary,#3b82f6)]" />
-        <p className="text-xs text-stone-500 dark:text-white/50">{label}</p>
+        <span className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--surface-border)] border-t-[var(--accent-primary)]" />
+        <p className="text-[13px] text-[var(--on-surface-muted)]">{label}</p>
       </div>
     </div>
   );
@@ -151,14 +157,14 @@ function SignInGate({ roomId, room, status }) {
           <button
             type="button"
             onClick={() => setShowAuth(true)}
-            className="w-full rounded-xl bg-[var(--accent-primary,#3b82f6)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600"
+            className="primary-action w-full"
           >
             Sign in / Sign up
           </button>
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="w-full rounded-xl px-4 py-2 text-xs text-[var(--on-surface-muted)] transition-colors hover:text-[var(--on-surface)]"
+            className="w-full rounded-lg px-4 py-2 text-xs text-[var(--on-surface-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--on-surface)]"
           >
             Back to home
           </button>
@@ -212,7 +218,7 @@ function JoinGate({ roomId, room, status, error, suggestedName, onJoin }) {
             onChange={(event) => setName(event.target.value)}
             maxLength={40}
             placeholder="e.g. Alok"
-            className="mt-1.5 w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5 text-sm font-normal normal-case tracking-normal text-stone-800 placeholder-stone-400 focus:border-[var(--accent-primary,#3b82f6)] focus:outline-none dark:border-white/10 dark:bg-black/40 dark:text-white dark:placeholder-white/30"
+            className="field-input mt-1.5 font-normal normal-case tracking-normal"
           />
         </label>
 
@@ -225,7 +231,7 @@ function JoinGate({ roomId, room, status, error, suggestedName, onJoin }) {
         <button
           type="submit"
           disabled={!name.trim() || busy || status === 'joining'}
-          className="w-full rounded-xl bg-[var(--accent-primary,#3b82f6)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-40"
+          className="primary-action w-full disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy || status === 'joining' ? 'Joining…' : 'Join room'}
         </button>
@@ -256,13 +262,13 @@ function WaitingRoom({ onLeave }) {
         This room is locked. The host has been told you are here — you will join
         automatically the moment they let you in.
       </p>
-      <div className="mb-5 h-1 overflow-hidden rounded-full bg-stone-200 dark:bg-white/10">
-        <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--accent-primary,#3b82f6)]" />
+      <div className="mb-5 h-1 overflow-hidden rounded-full bg-[var(--surface-raised)]">
+        <div className="h-full w-1/3 animate-pulse rounded-full bg-[var(--accent-primary)]" />
       </div>
       <button
         type="button"
         onClick={onLeave}
-        className="w-full rounded-xl border border-stone-200 px-4 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/5"
+        className="secondary-action w-full border-[var(--surface-border)] bg-[var(--surface-raised)] text-[var(--on-surface)]"
       >
         Leave
       </button>
@@ -296,15 +302,15 @@ function EndedScreen({ reason, by, onExport, onHome, onRejoin }) {
         <button
           type="button"
           onClick={onExport}
-          className="w-full rounded-xl bg-[var(--accent-primary,#3b82f6)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600"
+          className="primary-action w-full"
         >
-          ⬇️ Download this session
+          Download this session
         </button>
         {reason !== 'kicked' && (
           <button
             type="button"
             onClick={onRejoin}
-            className="w-full rounded-xl border border-stone-200 px-4 py-2.5 text-sm font-medium text-stone-600 transition-colors hover:bg-stone-100 dark:border-white/10 dark:text-white/70 dark:hover:bg-white/5"
+            className="secondary-action w-full border-[var(--surface-border)] bg-[var(--surface-raised)] text-[var(--on-surface)]"
           >
             Rejoin
           </button>
@@ -341,7 +347,7 @@ function StatusBar({
    * Share button, which is the only thing in here anyone taps.
    */
   return (
-    <div className="pointer-events-auto absolute left-1/2 top-3 z-40 flex max-w-[94vw] -translate-x-1/2 items-center gap-1.5 overflow-hidden rounded-full border border-stone-300 bg-stone-200/80 px-3 py-1.5 text-[11px] font-medium text-stone-700 shadow-lg backdrop-blur-md sm:top-4 sm:gap-2.5 sm:px-3.5 dark:border-white/10 dark:bg-black/50 dark:text-white/80">
+    <div className="room-statusbar pointer-events-auto absolute left-1/2 top-3 z-40 flex max-w-[94vw] -translate-x-1/2 items-center gap-1.5 overflow-hidden px-2.5 py-1.5 text-[11px] font-medium sm:top-4 sm:gap-2.5 sm:px-3">
       <span className="max-w-[8rem] truncate font-semibold sm:max-w-none">
         {title || `Room ${String(roomId).slice(0, 8)}`}
       </span>
@@ -361,7 +367,9 @@ function StatusBar({
         </span>
       ) : null}
 
-      {locked && <span title="Locked — new joiners need approval">🔒</span>}
+      {locked && (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-label="Room locked"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      )}
 
       <span className="hidden h-1 w-1 shrink-0 rounded-full bg-stone-400 sm:block dark:bg-white/30" />
       <span className="flex shrink-0 items-center gap-1.5" title={transportNote || undefined}>
@@ -383,7 +391,7 @@ function StatusBar({
       <button
         type="button"
         onClick={onShareLink}
-        className="ml-1 shrink-0 rounded bg-stone-300/60 px-2 py-1 transition-colors hover:bg-stone-400/60 dark:bg-white/10 dark:hover:bg-white/20"
+        className="ml-1 shrink-0 rounded-md border border-[var(--surface-border)] bg-[var(--surface-raised)] px-2 py-1 font-semibold transition-colors hover:bg-[var(--bg-muted)]"
       >
         Share
       </button>
@@ -1142,7 +1150,7 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
     /* See the `shell` comment: dvh so the control bar is reachable on a phone,
        and `text-[var(--on-surface)]` because a hard-coded `text-white` here made
        every unstyled string in the room invisible in the light theme. */
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-[var(--bg-base,#0a0a0f)] text-[var(--on-surface)]">
+    <div className="room-shell relative h-[100dvh] w-full overflow-hidden text-[var(--on-surface)]">
       <VideoGrid
         localStream={localStream}
         remoteStreams={remoteStreams}

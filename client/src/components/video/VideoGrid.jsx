@@ -143,10 +143,10 @@ export default function VideoGrid({
 
   if (spotlight) {
     return (
-      <div className="flex h-full w-full flex-col gap-3 bg-[var(--bg-primary)] p-3">
+      <div className="flex h-full w-full flex-col gap-2 bg-transparent p-2">
         <div className="min-h-0 flex-1">{renderTile(spotlight)}</div>
         {rest.length > 0 && (
-          <div className="flex h-24 shrink-0 gap-3 overflow-x-auto pb-1 sm:h-32">
+          <div className="flex h-24 shrink-0 gap-2 overflow-x-auto pb-1 sm:h-32">
             {rest.map((tile) => (
               <div key={tile.id} className="aspect-video h-full shrink-0">
                 {renderTile(tile)}
@@ -160,7 +160,7 @@ export default function VideoGrid({
 
   return (
     <div
-      className={`grid h-full w-full gap-3 bg-[var(--bg-primary)] p-3 transition-all duration-300 ${gridClassFor(
+      className={`grid h-full w-full gap-2 bg-transparent p-2 transition-all duration-300 ${gridClassFor(
         tiles.length
       )}`}
     >

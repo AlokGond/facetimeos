@@ -78,7 +78,7 @@ export default function Modal({ isOpen, onClose, title, children, labelledBy }) 
       aria-labelledby={labelledBy}
     >
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="dialog-backdrop absolute inset-0 transition-opacity"
         onClick={onClose}
       />
 
@@ -86,7 +86,7 @@ export default function Modal({ isOpen, onClose, title, children, labelledBy }) 
         ref={panelRef}
         tabIndex={-1}
         onClick={stop}
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border shadow-2xl ftos-fade"
+        className="dialog-surface ftos-fade relative w-full max-w-md overflow-hidden"
         style={{
           background: 'var(--bg-secondary)',
           borderColor: 'var(--border-subtle)',

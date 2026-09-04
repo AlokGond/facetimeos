@@ -138,7 +138,7 @@ export default function Home() {
   );
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col" style={{ background: 'var(--bg-primary)' }}>
+    <div className="site-shell flex min-h-[100dvh] flex-col">
       <AuthModal
         isOpen={showAuthModal}
         onClose={closeAuthModal}
@@ -152,624 +152,322 @@ export default function Home() {
         }
       />
 
-      {/* ─── Navbar ─── */}
-      <nav
-        className="fixed top-0 w-full z-50"
-        style={{
-          background: 'var(--bg-nav)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1px solid var(--border-subtle)',
-        }}
-      >
-        <div className="mx-auto w-full max-w-6xl px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-bold"
-              style={{ background: 'var(--accent-primary)' }}
-            >
-              F
+      <header className="site-header fixed inset-x-0 top-0 z-50">
+        <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <span className="brand-mark" aria-hidden="true" />
+            <div className="flex items-baseline gap-2">
+              <span className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
+                FaceTimeOS
+              </span>
+              <span className="hidden text-[11px] font-medium text-[var(--text-muted)] sm:inline">
+                shared room
+              </span>
             </div>
-            <span className="text-base font-semibold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-              FaceTimeOS
-            </span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <ThemeSwitcher />
-
             <button
               onClick={() => openModal('join')}
-              className="px-3.5 py-2 rounded-md text-sm transition-colors hidden md:block"
-              style={{ color: 'var(--text-secondary)' }}
+              className="text-action hidden px-3 py-2 sm:block"
             >
-              Join Room
+              Join a room
             </button>
-
             <button
               onClick={() => openModal('create')}
-              className="gradient-btn px-4 py-2 rounded-md text-sm font-medium text-white"
+              className="primary-action min-h-9 px-3.5 py-2"
             >
-              Create Room
+              New room
             </button>
-
             {user ? (
-              <div className="flex items-center gap-2.5 ml-1">
+              <div className="ml-1 flex items-center gap-2">
                 <div
-                  className="w-7 h-7 rounded-md flex items-center justify-center text-xs font-medium text-white"
-                  style={{ background: 'var(--accent-primary)' }}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent-soft)] text-xs font-semibold text-[var(--accent-primary)] ring-1 ring-[var(--border-subtle)]"
                   title={user.displayName || user.email}
                 >
                   {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
                 </div>
                 <button
                   onClick={logout}
-                  className="px-3 py-2 rounded-md text-sm transition-colors hidden md:block"
-                  style={{ color: 'var(--text-muted)' }}
+                  className="text-action hidden px-2.5 py-2 md:block"
                 >
                   Sign out
                 </button>
               </div>
             ) : (
-              /* Rendered unconditionally. Wrapping this in `authAvailable` made
-                 the feature look deleted on a build with no Firebase keys — the
-                 modal explains that situation far better than a missing button
-                 does. */
               <button
                 onClick={() => setShowAuthModal(true)}
-                className="px-3.5 py-2 rounded-md text-sm font-medium transition-colors"
-                style={{
-                  color: 'var(--text-secondary)',
-                }}
+                className="text-action px-2.5 py-2"
               >
                 Sign in
               </button>
             )}
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* ─── Hero ─── */}
-      <main className="flex-grow flex flex-col">
-        {/* One container width for every band on this page — the nav, each
-            section and the footer previously used max-w-7xl / 5xl / 4xl / 2xl,
-            so their left edges stepped in and out as you scrolled. */}
-        <section className="mx-auto w-full max-w-6xl px-6 pt-32 pb-16 md:pt-40 md:pb-24 lg:pb-32">
-          {/* Two equal columns rather than flex-1 boxes with different max
-              widths, which left a dead gap down the middle of the hero. */}
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Left: Copy */}
-            <div className="min-w-0">
-              <p className="text-xs mb-6" style={{ color: 'var(--text-muted)' }}>
-                A call with the tools already inside it
-              </p>
-
-              <h1
-                className="font-bold tracking-tight leading-[1.08] mb-6"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: 'clamp(2.5rem, 6vw, 4.5rem)',
-                  color: 'var(--text-primary)',
-                  lineHeight: 1.08,
-                }}
-              >
-                Stop screen-sharing
-                <br />
-                <span style={{ color: 'var(--accent-primary)' }}>your editor.</span>
+      <main className="flex-1 pt-16">
+        <section className="mx-auto w-full max-w-[1180px] px-4 pb-16 pt-16 sm:px-6 sm:pt-24 lg:pb-24 lg:pt-28">
+          <div className="grid items-center gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
+            <div>
+              <p className="eyebrow mb-6">Built for working sessions</p>
+              <h1 className="max-w-2xl text-[clamp(2.65rem,6.5vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.065em] text-[var(--text-primary)]">
+                The call where the work stays open.
               </h1>
-
-              <p
-                className="text-base md:text-lg max-w-lg mb-10 leading-relaxed"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                Sharing a screen is a bad way to write code with someone: one person
-                types and everyone else reads out line numbers. Here the editor, the
-                whiteboard and the notes are inside the call, so anybody can just put
-                their cursor in the file. Close the tab — it is all still there tomorrow.
+              <p className="mt-7 max-w-xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
+                Video, code, notes, a whiteboard, and the decisions you made—arranged in one room
+                instead of scattered across six tabs.
               </p>
-
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => openModal('create')}
-                  className="gradient-btn px-7 py-3 rounded-lg text-sm font-medium text-white"
+                  className="primary-action px-5"
                 >
-                  Create a Room
+                  Start a room
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => openModal('join')}
-                  className="px-7 py-3 rounded-lg text-sm font-medium transition-colors border"
-                  style={{
-                    borderColor: 'var(--border-subtle)',
-                    color: 'var(--text-primary)',
-                  }}
+                  className="secondary-action px-5"
                 >
-                  Join a Room
+                  Join with a link
                 </button>
               </div>
-
-              <p className="text-xs mt-8 max-w-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              <p className="mt-6 max-w-md text-[13px] leading-5 text-[var(--text-muted)]">
                 {needsAccount
-                  ? 'Sign in once so the room knows who is who. After that it is just a browser tab — Chrome, Edge, Brave or Firefox. No install, no extension.'
-                  : 'Just a browser tab — Chrome, Edge, Brave or Firefox. No install, no extension.'}
+                  ? 'Sign in once, then send the room link. Nothing to install.'
+                  : 'Open it in your browser. Nothing to install.'}
               </p>
             </div>
 
-            {/* Right: Abstract visual — represents the spatial desktop */}
-            <div className="w-full min-w-0">
-              <div
-                className="rounded-xl border overflow-hidden"
-                style={{
-                  /* `--surface-panel`, not `--bg-card`: in dark mode that token is a
-                     3% white overlay, so the whole mock had no fill and the fake
-                     window edges floated on the page background. */
-                  background: 'var(--surface-panel)',
-                  borderColor: 'var(--border-subtle)',
-                  boxShadow: '0 0 0 1px var(--border-subtle), 0 20px 60px -12px rgba(0,0,0,0.15)',
-                }}
-              >
-                {/* Fake browser chrome */}
-                <div
-                  className="flex items-center gap-1.5 px-4 py-2.5 border-b"
-                  style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border-subtle)' }}
-                >
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#ff5f57' }} />
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#febc2e' }} />
-                    <div className="w-2.5 h-2.5 rounded-full" style={{ background: '#28c840' }} />
+            <div className="workspace-preview min-h-[430px] w-full">
+              <div className="flex h-12 items-center justify-between border-b border-[#283240] px-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="truncate text-xs font-semibold">Design review</span>
+                  <span className="hidden text-[11px] text-[#8491a2] sm:inline">3 people · live</span>
+                </div>
+                <div className="flex -space-x-1.5">
+                  {['AK', 'JS', 'MR'].map((name, index) => (
+                    <span
+                      key={name}
+                      className="grid h-7 w-7 place-items-center rounded-full border-2 border-[#0c1118] text-[9px] font-semibold"
+                      style={{ background: ['#315fda', '#916b45', '#476f67'][index] }}
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="relative grid min-h-[378px] grid-cols-[1fr_8rem] gap-2 p-2 sm:grid-cols-[1fr_10rem]">
+                <div className="relative overflow-hidden rounded-[10px] border border-[#293442] bg-[#151c25]">
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="grid h-20 w-20 place-items-center rounded-full bg-[#26364d] text-xl font-semibold text-[#b7cae7]">
+                      AK
+                    </div>
                   </div>
-                  <div className="flex-1 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
-                    facetimeos.app/room/abc-123
+                  <div className="absolute bottom-3 left-3 rounded-md border border-white/10 bg-black/50 px-2 py-1 text-[10px] text-white/80">
+                    Alok · presenting
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {[['JS', '#57446b'], ['MR', '#3b5a55']].map(([name, color]) => (
+                    <div key={name} className="relative flex-1 rounded-[10px] border border-[#293442]" style={{ background: color }}>
+                      <span className="absolute bottom-2 left-2 text-[10px] font-medium text-white/80">{name}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="preview-window absolute bottom-5 left-5 right-16 h-[178px] overflow-hidden sm:right-24">
+                  <div className="flex h-9 items-center justify-between border-b border-[#303b4a] bg-[#1b2430] px-3">
+                    <div className="flex items-center gap-2">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8dafff" strokeWidth="2" aria-hidden="true">
+                        <path d="m8 9-4 3 4 3M16 9l4 3-4 3M14 5l-4 14" />
+                      </svg>
+                      <span className="text-[10px] font-semibold">checkout.js</span>
+                    </div>
+                    <span className="text-[9px] text-[#8491a2]">Edited just now</span>
+                  </div>
+                  <div className="grid h-[139px] grid-cols-[2rem_1fr] bg-[#10161e] font-mono text-[10px] leading-5">
+                    <div className="border-r border-[#25303d] py-3 pr-2 text-right text-[#526071]">8<br />9<br />10<br />11<br />12</div>
+                    <div className="p-3 text-[#9ca8b8]">
+                      <div><span className="text-[#c5a3ff]">const</span> <span className="text-[#8db5ff]">room</span> = await createRoom();</div>
+                      <div><span className="text-[#c5a3ff]">await</span> room.connect();</div>
+                      <div>&nbsp;</div>
+                      <div><span className="text-[#6fc7a8]">{'// Shared with everyone'}</span></div>
+                      <div className="inline-block border-r border-[#7fa7ff] bg-[#315fda]/25 pr-0.5">room.open(notes)</div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Spatial desktop mock */}
-                <div className="relative p-4" style={{ minHeight: '280px' }}>
-                  {/* Video tiles row */}
-                  <div className="flex gap-2 mb-3">
-                    {[
-                      { color: '#6366f1', w: '28%' },
-                      { color: '#8b5cf6', w: '28%' },
-                      { color: '#ec4899', w: '28%' },
-                    ].map((v, i) => (
-                      <div
-                        key={i}
-                        className="rounded-lg flex items-center justify-center"
-                        style={{
-                          width: v.w,
-                          height: '72px',
-                          background: `linear-gradient(135deg, ${v.color}22, ${v.color}11)`,
-                          border: `1px solid var(--border-subtle)`,
-                        }}
-                      >
-                        <div className="w-6 h-6 rounded-full" style={{ background: v.color + '44' }} />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Floating widgets */}
-                  <div className="relative" style={{ height: '150px' }}>
-                    {/* Code editor window */}
-                    <div
-                      className="absolute rounded-lg border overflow-hidden"
-                      style={{
-                        left: '0', top: '0', width: '55%', height: '100%',
-                        background: 'rgba(30,30,30,0.8)',
-                        borderColor: 'var(--border-subtle)',
-                      }}
-                    >
-                      <div className="px-2.5 py-1.5 flex items-center gap-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--accent-primary)' }} />
-                        <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>main.js</span>
-                      </div>
-                      <div className="p-2.5 font-mono" style={{ fontSize: '8px', lineHeight: 1.6 }}>
-                        <div><span style={{ color: '#c678dd' }}>const</span> <span style={{ color: '#e5c07b' }}>app</span> <span style={{ color: '#56b6c2' }}>=</span> <span style={{ color: '#e5c07b' }}>express</span>()</div>
-                        <div><span style={{ color: '#c678dd' }}>async function</span> <span style={{ color: '#61afef' }}>init</span>() {'{'}</div>
-                        <div className="pl-2"><span style={{ color: '#c678dd' }}>await</span> <span style={{ color: '#61afef' }}>connect</span>()</div>
-                        <div className="pl-2"><span style={{ color: '#98c379' }}>{'// ← editing live'}</span></div>
-                        <div>{'}'}</div>
-                      </div>
+                <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-[#394554] bg-[#151c26]/95 p-1.5 shadow-xl">
+                  {[
+                    ['Mic', 'M'],
+                    ['Camera', 'C'],
+                    ['Tools', '+'],
+                    ['Chat', '…'],
+                  ].map(([label, glyph]) => (
+                    <div key={label} className="flex h-8 min-w-8 items-center justify-center rounded-md bg-white/[0.06] px-2 text-[9px] text-[#c6ced9]" title={label}>
+                      {glyph}
                     </div>
-
-                    {/* Whiteboard window */}
-                    <div
-                      className="absolute rounded-lg border overflow-hidden"
-                      style={{
-                        right: '0', top: '0', width: '42%', height: '55%',
-                        background: 'rgba(26,26,46,0.9)',
-                        borderColor: 'var(--border-subtle)',
-                      }}
-                    >
-                      <div className="px-2.5 py-1.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                        <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Whiteboard</span>
-                      </div>
-                      <svg viewBox="0 0 120 50" className="w-full" style={{ height: '70px' }}>
-                        <path d="M10,40 Q30,10 50,30 T90,20" fill="none" stroke="#f97066" strokeWidth="1.5" />
-                        <circle cx="70" cy="15" r="8" fill="none" stroke="#6366f1" strokeWidth="1" />
-                        <rect x="5" y="35" width="25" height="12" rx="2" fill="none" stroke="#a3e635" strokeWidth="1" />
-                      </svg>
-                    </div>
-
-                    {/* Notes window */}
-                    <div
-                      className="absolute rounded-lg border overflow-hidden"
-                      style={{
-                        right: '0', bottom: '0', width: '42%', height: '40%',
-                        background: 'var(--surface-raised)',
-                        borderColor: 'var(--border-subtle)',
-                      }}
-                    >
-                      <div className="px-2.5 py-1.5" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                        <span className="text-[9px]" style={{ color: 'var(--on-surface-muted)' }}>Meeting Notes</span>
-                      </div>
-                      <div className="p-2 space-y-1">
-                        {[1, 2, 3].map(i => (
-                          <div key={i} className="rounded" style={{ height: '3px', width: `${70 - i * 15}%`, background: 'var(--surface-border)' }} />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  ))}
+                  <div className="flex h-8 items-center rounded-md bg-[#c74646] px-2.5 text-[9px] font-semibold">Leave</div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div className="mt-14 grid gap-5 border-t border-[var(--border-subtle)] pt-6 text-[13px] text-[var(--text-muted)] sm:grid-cols-3 lg:mt-20">
+            <p><strong className="font-semibold text-[var(--text-secondary)]">Peer-to-peer media.</strong> Your video is not recorded or mixed on a server.</p>
+            <p><strong className="font-semibold text-[var(--text-secondary)]">Work that survives.</strong> Notes, code, layout, and chat are there when you return.</p>
+            <p><strong className="font-semibold text-[var(--text-secondary)]">Files you can keep.</strong> Export the session as code, Markdown, SVG, and JSON.</p>
+          </div>
         </section>
 
-        {/* ─── What is actually in the room ─── */}
-        <section className="py-24 md:py-28 px-6">
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="mb-14 max-w-xl">
-              <h2
-                className="font-bold tracking-tight mb-4"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                Five things you can open mid-sentence
+        <section className="border-y border-[var(--border-subtle)] bg-[var(--bg-secondary)]">
+          <div className="mx-auto grid w-full max-w-[1180px] gap-12 px-4 py-16 sm:px-6 md:grid-cols-[0.7fr_1.3fr] lg:py-24">
+            <div>
+              <p className="eyebrow mb-5">Inside the room</p>
+              <h2 className="max-w-sm text-3xl font-semibold leading-tight tracking-[-0.04em] text-[var(--text-primary)] sm:text-4xl">
+                Less presenting. More doing.
               </h2>
-              <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                They open as windows on a shared canvas, not as tabs somewhere else.
-                Drag one where you want it and everyone sees it in the same place.
+              <p className="mt-5 max-w-sm text-[15px] leading-6 text-[var(--text-secondary)]">
+                Open a tool beside the call, move it where it makes sense, and let everyone work in it.
               </p>
             </div>
 
-            {/* A list, not a card grid. These five entries genuinely differ in
-                length and in how much explaining they need; forcing them into
-                three equal boxes with three equal-length sentences is exactly
-                what made this page read like brochure filler. */}
-            <dl className="border-t" style={{ borderColor: 'var(--border-subtle)' }}>
+            <div className="hairline-list border-y border-[var(--border-subtle)]">
               {[
-                [
-                  'Code editor',
-                  'Monaco — the editor VS Code is built on. Two people can type in the same file and neither one clobbers the other, and the Run button executes JavaScript in a sandboxed iframe. Only JavaScript, so do not go looking for Python.',
-                ],
-                [
-                  'Whiteboard',
-                  'Pen, shapes, arrows, text. Enough to sketch a schema on. Exports as an SVG you can paste into a report.',
-                ],
-                [
-                  'Shared notes',
-                  'One text file for the call. Somebody always ends up being the note-taker — this way nobody has to be.',
-                ],
-                [
-                  'Timer',
-                  'For the fifteen-minute sync that is drifting towards forty. It sits on the wall, so nobody has to be the person who mentions it.',
-                ],
-                [
-                  'A browser panel',
-                  'Keep the docs or a dashboard next to the faces instead of alt-tabbing away and losing the thread. Sites that send an X-Frame-Options header cannot be embedded by anything, and it tells you that plainly rather than showing a white rectangle for seven seconds.',
-                ],
-              ].map(([term, copy]) => (
-                <div
-                  key={term}
-                  className="grid gap-2 border-b py-6 sm:grid-cols-[11rem_1fr] sm:gap-8"
-                  style={{ borderColor: 'var(--border-subtle)' }}
-                >
-                  <dt className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    {term}
-                  </dt>
-                  <dd
-                    className="m-0 max-w-2xl text-sm leading-relaxed"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    {copy}
-                  </dd>
+                ['01', 'Code together', 'A shared Monaco editor with conflict-free editing and a sandboxed JavaScript runner.'],
+                ['02', 'Draw the hard part', 'Sketch an architecture, connect ideas with arrows, and export the board as SVG.'],
+                ['03', 'Keep the useful bits', 'Notes, chat, room layout, and marked decisions persist after everyone leaves.'],
+                ['04', 'Bring context closer', 'Open a reference page or set a visible timer without leaving the conversation.'],
+              ].map(([number, title, copy]) => (
+                <article key={number} className="grid gap-3 py-6 sm:grid-cols-[3rem_11rem_1fr] sm:items-baseline sm:gap-5">
+                  <span className="font-mono text-xs text-[var(--accent-secondary)]">{number}</span>
+                  <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">{title}</h3>
+                  <p className="text-sm leading-6 text-[var(--text-secondary)]">{copy}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-[1180px] px-4 py-16 sm:px-6 lg:py-24">
+          <div className="grid gap-12 md:grid-cols-[0.7fr_1.3fr]">
+            <div>
+              <p className="eyebrow mb-5">The honest details</p>
+              <h2 className="max-w-sm text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl">
+                Know what you are opening.
+              </h2>
+            </div>
+            <dl className="border-y border-[var(--border-subtle)]">
+              {[
+                ['Room size', 'Best with roughly six people. Peer-to-peer video asks more of each connection as the room grows.'],
+                ['Privacy', 'Media stays encrypted between browsers. The signaling service coordinates the room but does not decode the call.'],
+                ['Persistence', 'Shared documents and room state are stored with the room so a reload does not erase the work.'],
+                ['Permissions', 'Host, editor, and viewer access are verified with signed room tokens—not browser-made role flags.'],
+                ['Export', 'One ZIP with source, notes, chat, timeline data, and the whiteboard as an SVG.'],
+              ].map(([term, description]) => (
+                <div key={term} className="fact-row border-b border-[var(--border-subtle)] last:border-b-0">
+                  <dt className="text-sm font-semibold text-[var(--text-primary)]">{term}</dt>
+                  <dd className="m-0 text-sm leading-6 text-[var(--text-secondary)]">{description}</dd>
                 </div>
               ))}
             </dl>
           </div>
         </section>
 
-        {/* ─── How it works ─── */}
-        <section className="py-24 md:py-28 px-6">
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-start">
-              <div>
-                <h2
-                  className="font-bold tracking-tight mb-4"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  The video never touches a server
-                </h2>
-                <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  Audio and video go straight from one browser to another. Nothing in
-                  the middle decodes it, mixes it or records it, because there is
-                  nothing in the middle. On a locked-down office network a TURN relay
-                  forwards the packets, and even then they stay encrypted end to end —
-                  the relay is a postman, not a reader.
-                </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  What the small server does do: introduce people to each other, hold
-                  the host&apos;s authority so mute and kick cannot be faked by
-                  editing a message, and keep the room&apos;s documents so the tenth
-                  person to join does not need the ninth to still be online.
-                </p>
-              </div>
-
-              {/**
-               * This used to be three big accent-coloured zeros — "media servers in
-               * the path: 0", "recordings kept: 0", "downloads to install: 0". They
-               * were true, but a made-up statistic in a huge typeface is the single
-               * most brochure-like thing a page can do. A numbered walk-through of
-               * what actually happens is more use to anybody deciding whether to
-               * trust this with a meeting.
-               */}
-              <ol className="m-0 flex list-none flex-col gap-5 p-0">
-                {[
-                  'You press Create. The server mints the room and signs a host token for your browser. Earlier versions let the browser invent that token itself, which meant anybody could be host of any room by writing one localStorage key.',
-                  'You send the link. Whoever opens it gets introduced to everyone already inside, and from that point the media path is browser to browser.',
-                  'The editor, the board and the notes are CRDTs. Two edits to the same line merge instead of one winning, so nothing has to be locked and nobody has to ask for the file.',
-                  'When you are done, Export writes a ZIP in your browser: the source files, the board as SVG, notes and chat as Markdown. It is not uploaded anywhere to be built.',
-                ].map((step, i) => (
-                  <li key={i} className="flex gap-4">
-                    <span
-                      className="shrink-0 text-sm font-semibold tabular-nums"
-                      style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent-primary)' }}
-                    >
-                      {i + 1}
-                    </span>
-                    <span className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                      {step}
-                    </span>
-                  </li>
-                ))}
-              </ol>
+        <section className="border-t border-[var(--border-subtle)]">
+          <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start justify-between gap-8 px-4 py-14 sm:px-6 md:flex-row md:items-center lg:py-20">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">Bring one other person.</h2>
+              <p className="mt-2 text-sm text-[var(--text-secondary)]">Open the editor while you talk. You will know in five minutes if it fits.</p>
             </div>
-          </div>
-        </section>
-
-        {/* ─── What the other meeting apps don't do ─── */}
-        <section className="py-24 md:py-28 px-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="mb-14 max-w-xl">
-              <h2
-                className="font-bold tracking-tight mb-4"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                What Zoom and Meet don&apos;t do
-              </h2>
-              <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                Those two are better than this at being a video call. None of them
-                leave anything behind except a recording nobody opens.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                {
-                  /* The one that matters most gets the full width. Six identical
-                     boxes implied all six were equally important, which they are
-                     not. */
-                  wide: true,
-                  title: 'The room is still there next week',
-                  desc: 'Close the tab and come back on Thursday: the code, the board, the notes and even where you dragged the windows are exactly where you left them. Reloading gets your seat back rather than adding a ghost copy of you to the participant list.',
-                },
-                {
-                  title: 'A timeline, not a transcript',
-                  desc: 'Joins, leaves, windows opened, and the decisions somebody bothered to write down — a short log you can read in ten seconds. Written by the people who were in the room instead of guessed at by a model.',
-                },
-                {
-                  title: 'Export is a ZIP, not a support ticket',
-                  desc: 'Source files, the whiteboard as SVG, notes and chat as Markdown, the timeline as JSON. It is built in your browser, so nothing gets uploaded to be packaged and there is no retention policy to go and read.',
-                },
-                {
-                  title: "Follow the presenter, until you don't",
-                  desc: "The host pins a tile or a window and everyone's view moves with them. The moment you drag something yourself you quietly stop following, instead of fighting the layout for the rest of the call.",
-                },
-                {
-                  title: 'Host powers are signed',
-                  desc: 'Mute, kick, lock and role changes are verified server-side against a signed token. A participant cannot forge one by editing a message — which the first version of this app cheerfully allowed, and which is the bug I am least proud of.',
-                },
-                {
-                  title: 'Roles belong to the link',
-                  desc: 'An invite link carries a role. A viewer can watch and cannot rewrite your file; an editor can. You mint the link for the role, so it does not matter who ends up holding it.',
-                },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className={`step-card rounded-xl p-6 ${item.wide ? 'md:col-span-2' : ''}`}
-                >
-                  <h3 className="text-sm font-semibold mb-1.5" style={{ color: 'var(--text-primary)' }}>
-                    {item.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed max-w-2xl" style={{ color: 'var(--text-secondary)' }}>
-                    {item.desc}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/**
-         * ─── Where it falls over ───
-         *
-         * A limits section is the least AI-sounding thing a landing page can have,
-         * and every one of these is a question the two of us would otherwise be
-         * answering by email. Being first to say "about six people" is cheaper than
-         * somebody discovering it during a class demo.
-         */}
-        <section className="py-24 md:py-28 px-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-16">
-              <div>
-                <h2
-                  className="font-bold tracking-tight mb-3"
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  Where it falls over
-                </h2>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  You would find these out in the first ten minutes anyway.
-                </p>
-              </div>
-
-              <ul className="m-0 flex list-none flex-col gap-5 p-0">
-                {[
-                  ['About six people.', 'Everybody sends their camera to everybody else, so the upload cost grows with the square of the room. Quality steps down as people arrive, but past six or so a home connection runs out before the app does.'],
-                  ['One webcam, one browser.', 'Two browsers on the same machine cannot both open the same camera. The second one joins with audio only and tells you why. That is the operating system, not this.'],
-                  /* LIMITS-TAIL */
-                  ['Strict networks need a relay.', 'Without TURN credentials on the server a few office and campus networks will connect audio and never video. The room says so when it has actually happened to you, rather than warning you up front about a problem you probably do not have.'],
-                  ['Run only runs JavaScript.', 'In a sandboxed iframe, in your own tab. There is no backend runtime behind it, so no Python, no npm packages, no file system.'],
-                  ['Nothing is recorded.', 'On purpose, and also structurally: there is no media server to record from, and adding one would mean putting a decoder in the middle of every call.'],
-                ].map(([lede, rest]) => (
-                  <li key={lede} className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    <strong className="font-semibold" style={{ color: 'var(--text-primary)' }}>{lede}</strong>{' '}
-                    {rest}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── CTA ─── */}
-        <section className="py-24 md:py-28 px-6">
-          <div className="mx-auto w-full max-w-6xl">
-            <div className="max-w-xl">
-              <h2
-                className="font-bold tracking-tight mb-4"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
-                  color: 'var(--text-primary)',
-                }}
-              >
-                Try it with one other person
-              </h2>
-              <p className="text-base mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                Make a room, paste the link to somebody, and open the code editor
-                while you talk. That is the whole thing — five minutes will tell you
-                whether it is useful to you.
-              </p>
-              <button
-                onClick={() => openModal('create')}
-                className="gradient-btn px-8 py-3 rounded-lg text-sm font-medium text-white"
-              >
-                Create a Room
-              </button>
-            </div>
+            <button onClick={() => openModal('create')} className="primary-action shrink-0 px-5">
+              Start a room
+            </button>
           </div>
         </section>
       </main>
 
-      {/* ─── Footer ─── */}
-      <footer className="py-10 px-6" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-        <div className="mx-auto w-full max-w-6xl flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded flex items-center justify-center text-white text-[10px] font-bold" style={{ background: 'var(--accent-primary)' }}>F</div>
-            <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>FaceTimeOS</span>
+      <footer className="border-t border-[var(--border-subtle)]">
+        <div className="mx-auto flex w-full max-w-[1180px] flex-col gap-4 px-4 py-7 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="brand-mark !h-6 !w-6 !rounded-md" aria-hidden="true" />
+            <span className="font-medium text-[var(--text-secondary)]">FaceTimeOS</span>
           </div>
-          <p className="text-xs max-w-md leading-relaxed md:text-right" style={{ color: 'var(--text-muted)' }}>
-            A final-year B.Tech CSE project at BBSBEC, Fatehgarh Sahib. WebRTC carries
-            the call; Yjs holds everything that has to outlive it. Still being worked
-            on, so if something looks half-finished it probably is.
-          </p>
+          <p className="m-0">A B.Tech CSE project built with WebRTC and Yjs.</p>
         </div>
       </footer>
 
-      {/* ─── Room Modal ─── */}
       {showModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
-          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}
+          className="dialog-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
           onClick={closeModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="room-dialog-title"
         >
           <div
-            className="w-full max-w-md relative animate-scale-in rounded-xl p-8"
-            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-subtle)', boxShadow: '0 24px 60px rgba(0,0,0,0.4)' }}
-            onClick={(e) => e.stopPropagation()}
+            className="dialog-surface relative w-full max-w-[28rem] p-6 animate-scale-in sm:p-7"
+            onClick={(event) => event.stopPropagation()}
           >
-            <button onClick={closeModal} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-black/5 dark:hover:bg-white/5" style={{ color: 'var(--text-muted)' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <button
+              onClick={closeModal}
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-md text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              aria-label="Close dialog"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
             </button>
 
-            <h3 className="text-lg font-semibold tracking-tight mb-1" style={{ color: 'var(--text-primary)' }}>
+            <p className="eyebrow mb-4">{showModal === 'create' ? 'New session' : 'Have an invite?'}</p>
+            <h2 id="room-dialog-title" className="pr-8 text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)]">
               {showModal === 'create' ? 'Create a room' : 'Join a room'}
-            </h3>
-            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+            </h2>
+            <p className="mb-6 mt-2 text-sm leading-6 text-[var(--text-secondary)]">
               {showModal === 'create'
-                ? 'You will be the host. Share the link afterwards and anyone who opens it lands in the same room.'
-                : 'Paste the link you were sent, or just the room id from the end of it.'}
+                ? 'You will host the room. Once it opens, copy the invite link for everyone else.'
+                : 'Paste the full invite link or the room ID from the end of it.'}
             </p>
 
             <form onSubmit={showModal === 'create' ? handleCreateRoom : handleJoinRoom} className="flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Display Name</label>
+                <label htmlFor="room-display-name" className="field-label">Your name</label>
                 <input
-                  type="text" required autoFocus
+                  id="room-display-name"
+                  type="text"
+                  required
+                  autoFocus
                   value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all focus:ring-1 focus:ring-[var(--accent-primary)]"
-                  /* `ringColor` is not a CSS property, so the focus ring rendered
-                     with Tailwind's default colour. It is a utility now. */
-                  style={{ background: 'var(--bg-input)', border: '1px solid var(--bg-input-border)', color: 'var(--text-primary)' }}
-                  placeholder="Your name"
+                  onChange={(event) => setDisplayName(event.target.value)}
+                  className="field-input"
+                  placeholder="How others will see you"
                 />
               </div>
 
               {showModal === 'join' && (
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Room link or ID</label>
+                  <label htmlFor="room-link" className="field-label">Room link or ID</label>
                   <input
-                    type="text" required
+                    id="room-link"
+                    type="text"
+                    required
                     value={roomId}
-                    onChange={(e) => setRoomId(e.target.value)}
-                    className="w-full rounded-lg px-3.5 py-2.5 text-sm outline-none transition-all"
-                    style={{ background: 'var(--bg-input)', border: '1px solid var(--bg-input-border)', color: 'var(--text-primary)' }}
-                    placeholder="https://…/room/abc-123  or  abc-123"
+                    onChange={(event) => setRoomId(event.target.value)}
+                    className="field-input"
+                    placeholder="Paste the invite here"
                   />
                 </div>
               )}
 
-              {error && (
-                /* Was accent text on a 12%-accent wash: about 2:1 against the panel
-                   in either theme, so the one message you need to read was the
-                   faintest thing in the modal. */
-                <p className="ftos-notice-warn text-xs rounded-lg px-3 py-2" role="alert">
-                  {error}
-                </p>
-              )}
+              {error && <p className="ftos-notice-warn rounded-md px-3 py-2 text-[13px]" role="alert">{error}</p>}
 
-              <button
-                type="submit"
-                disabled={busy}
-                className="gradient-btn w-full py-2.5 rounded-lg font-medium text-sm text-white mt-1 disabled:opacity-60"
-              >
-                {showModal === 'create' ? (busy ? 'Creating…' : 'Create Room') : 'Join Room'}
+              <button type="submit" disabled={busy} className="primary-action mt-1 w-full disabled:cursor-not-allowed disabled:opacity-60">
+                {showModal === 'create' ? (busy ? 'Creating…' : 'Create room') : 'Join room'}
               </button>
             </form>
           </div>

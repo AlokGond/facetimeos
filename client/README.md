@@ -14,7 +14,7 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result. The client is deliberately pinned to port 3000 because the local meeting server uses port 3001; if 3000 is already busy, stop that process instead of letting Next.js move onto the server port.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
 

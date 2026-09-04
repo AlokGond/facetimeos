@@ -121,9 +121,9 @@ export default function SpatialWindow({
       <div
         /* `ftos-panel` rather than `bg-[var(--bg-glass)]`: a floating window over
            live video needs an opaque fill, and the 4% glass token gave it none. */
-        className={`ftos-panel w-full h-full flex flex-col rounded-xl overflow-hidden border transition-shadow duration-200 ${
+        className={`ftos-panel flex h-full w-full flex-col overflow-hidden rounded-lg border transition-shadow duration-200 ${
           isActive
-            ? 'border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.15)]'
+            ? 'border-blue-500/60 shadow-[0_18px_50px_rgba(0,0,0,0.28)]'
             : 'border-[var(--surface-border)]'
         }`}
       >

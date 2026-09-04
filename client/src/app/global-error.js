@@ -22,8 +22,8 @@ export default function GlobalError({ error, reset }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#0a0a0f',
-          color: '#f0f0f5',
+          background: '#0d1117',
+          color: '#f3f6fa',
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
           padding: '1.5rem',
         }}
@@ -32,9 +32,9 @@ export default function GlobalError({ error, reset }) {
           style={{
             maxWidth: '28rem',
             width: '100%',
-            background: '#14141c',
-            border: '1px solid rgba(255,255,255,0.14)',
-            borderRadius: '1rem',
+            background: '#131922',
+            border: '1px solid #303a48',
+            borderRadius: '0.75rem',
             padding: '1.75rem',
           }}
         >
@@ -57,9 +57,9 @@ export default function GlobalError({ error, reset }) {
               fontSize: '0.875rem',
               fontWeight: 600,
               color: '#fff',
-              background: '#f97066',
+              background: '#3f73ef',
               border: 'none',
-              borderRadius: '0.75rem',
+              borderRadius: '0.6rem',
               cursor: 'pointer',
             }}
           >

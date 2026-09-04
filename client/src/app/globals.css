@@ -1,378 +1,388 @@
 @import "tailwindcss";
 
-/**
- * Tailwind 4 decides `dark:` by `prefers-color-scheme` unless told otherwise, but
- * the theme provider writes a class onto <html>. Without this the theme switcher
- * appeared to do nothing: every `dark:` utility in the app kept following the OS
- * instead of the choice the user just made.
- */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ========== Dark Theme (default) ========== */
 :root,
 html.dark {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-tertiary: #18181f;
-  /* The call surface and the panel fills. Named separately from --bg-primary
-     because the room is deliberately darker than the marketing pages. */
-  --bg-base: #0a0a0f;
-  --bg-muted: rgba(255, 255, 255, 0.05);
-  --bg-card: rgba(255, 255, 255, 0.03);
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --bg-glass-hover: rgba(255, 255, 255, 0.07);
-  --bg-nav: rgba(10, 10, 15, 0.8);
-  --bg-input: rgba(255, 255, 255, 0.04);
-  --bg-input-border: rgba(255, 255, 255, 0.08);
-  --accent-primary: #f97066;
-  --accent-secondary: #fb923c;
-  --accent-tertiary: #fbbf24;
-  --text-primary: #f0f0f5;
-  --text-secondary: #9ca3af;
-  /* Was #6b7280, which is 4.0:1 on this background — under the 4.5:1 floor at the
-     11–12px sizes it is actually used at, so captions and helper text were the
-     first thing to disappear. */
-  --text-muted: #8e94a3;
-  /* 6% white is invisible as a card edge on #0a0a0f: the feature cards on the
-     landing page had no discernible outline at all. */
-  --border-subtle: rgba(255, 255, 255, 0.11);
-  --border-hover: rgba(255, 255, 255, 0.12);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
-  --glow-primary: rgba(249, 112, 102, 0.12);
+  --bg-primary: #0d1117;
+  --bg-secondary: #131922;
+  --bg-tertiary: #1a2230;
+  --bg-base: #090d12;
+  --bg-muted: rgba(255, 255, 255, 0.055);
+  --bg-card: #131922;
+  --bg-glass: rgba(19, 25, 34, 0.9);
+  --bg-glass-hover: rgba(27, 35, 47, 0.94);
+  --bg-nav: rgba(13, 17, 23, 0.88);
+  --bg-input: #0f141c;
+  --bg-input-border: #303a48;
+  --accent-primary: #5b8cff;
+  --accent-primary-strong: #3f73ef;
+  --accent-secondary: #f0a46b;
+  --accent-soft: rgba(91, 140, 255, 0.14);
+  --text-primary: #f3f6fa;
+  --text-secondary: #b1bac8;
+  --text-muted: #8792a2;
+  --border-subtle: #28313e;
+  --border-hover: #3b4758;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-card-hover: 0 18px 50px rgba(0, 0, 0, 0.26);
+  --glow-primary: rgba(91, 140, 255, 0.2);
 
-  /**
-   * Room chrome, kept separate from the page tokens above.
-   *
-   * `--bg-card` and `--bg-glass` are 3–4% white overlays. They read correctly on
-   * a dark marketing page, where there is a solid background behind them — but a
-   * panel in the room floats over live video, so a 3% fill is simply
-   * transparent. That is why the participant list and the widget tray appeared to
-   * have no background at all and their text sat unreadable on top of somebody's
-   * face. These four are opaque (or near enough) in both themes and are what the
-   * room's panels, menus and pills use.
-   */
-  --surface-panel: #14141c;
-  --surface-raised: #1e1e28;
-  --surface-overlay: rgba(16, 16, 24, 0.82);
-  --surface-border: rgba(255, 255, 255, 0.14);
-  --on-surface: #f4f4f7;
-  --on-surface-muted: #a8a8b8;
-  --notice-warn-bg: #3a2a12;
-  --notice-warn-border: rgba(251, 191, 36, 0.45);
-  --notice-warn-text: #fde68a;
-  --notice-info-bg: #16233a;
-  --notice-info-border: rgba(96, 165, 250, 0.45);
-  --notice-info-text: #bfdbfe;
+  --surface-panel: #121821;
+  --surface-raised: #1a222d;
+  --surface-overlay: rgba(14, 19, 27, 0.9);
+  --surface-border: #303a48;
+  --on-surface: #f2f5f9;
+  --on-surface-muted: #9da8b7;
+  --notice-warn-bg: #352313;
+  --notice-warn-border: #79502f;
+  --notice-warn-text: #ffd3a8;
+  --notice-info-bg: #132744;
+  --notice-info-border: #315f99;
+  --notice-info-text: #c9dfff;
   color-scheme: dark;
 }
 
-/* ========== Light Theme ========== */
 html.light {
-  --bg-primary: #fafaf9;
-  --bg-secondary: #f5f5f4;
-  --bg-tertiary: #e7e5e4;
-  --bg-base: #e7e5e4;
-  --bg-muted: rgba(0, 0, 0, 0.04);
+  --bg-primary: #f4f5f7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e9ecf0;
+  --bg-base: #e7eaee;
+  --bg-muted: rgba(24, 31, 42, 0.055);
   --bg-card: #ffffff;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  --bg-glass-hover: rgba(255, 255, 255, 0.95);
-  --bg-nav: rgba(250, 250, 249, 0.92);
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --bg-glass-hover: rgba(255, 255, 255, 0.98);
+  --bg-nav: rgba(244, 245, 247, 0.9);
   --bg-input: #ffffff;
-  --bg-input-border: rgba(0, 0, 0, 0.15);
-  --accent-primary: #e85d4f;
-  --accent-secondary: #f97066;
-  --accent-tertiary: #fb923c;
-  --text-primary: #1c1917;
-  --text-secondary: #57534e;
-  --text-muted: #615c57;
-  --border-subtle: rgba(0, 0, 0, 0.14);
-  --border-hover: rgba(0, 0, 0, 0.2);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 8px 30px rgba(0, 0, 0, 0.08);
-  --glow-primary: rgba(232, 93, 79, 0.12);
+  --bg-input-border: #cbd1da;
+  --accent-primary: #315fda;
+  --accent-primary-strong: #244ec0;
+  --accent-secondary: #c9682f;
+  --accent-soft: rgba(49, 95, 218, 0.1);
+  --text-primary: #161b22;
+  --text-secondary: #4c5665;
+  --text-muted: #687384;
+  --border-subtle: #d6dbe2;
+  --border-hover: #aeb7c4;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.07);
+  --shadow-card-hover: 0 18px 50px rgba(16, 24, 40, 0.12);
+  --glow-primary: rgba(49, 95, 218, 0.16);
 
-  /* Light-mode room chrome. Warm greys rather than pure white: a white panel over
-     bright video has no edge, and the whole call reads as washed out. */
   --surface-panel: #ffffff;
-  --surface-raised: #f1efee;
-  --surface-overlay: rgba(255, 255, 255, 0.9);
-  --surface-border: rgba(28, 25, 23, 0.14);
-  --on-surface: #1c1917;
-  --on-surface-muted: #57534e;
-  --notice-warn-bg: #fef3c7;
-  --notice-warn-border: rgba(180, 83, 9, 0.35);
-  --notice-warn-text: #78350f;
-  --notice-info-bg: #dbeafe;
-  --notice-info-border: rgba(29, 78, 216, 0.3);
-  --notice-info-text: #1e3a8a;
+  --surface-raised: #f2f4f7;
+  --surface-overlay: rgba(255, 255, 255, 0.92);
+  --surface-border: #cbd2dc;
+  --on-surface: #171c24;
+  --on-surface-muted: #566171;
+  --notice-warn-bg: #fff4e8;
+  --notice-warn-border: #e3ad79;
+  --notice-warn-text: #743d16;
+  --notice-info-bg: #eaf2ff;
+  --notice-info-border: #9bb9ef;
+  --notice-info-text: #244b93;
   color-scheme: light;
 }
 
-/* ========== Base ========== */
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, sans-serif;
   margin: 0;
-  padding: 0;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
-/* Subtle background glow — adds depth, removes flat AI feel */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(249,112,102,0.07), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(99,102,241,0.04), transparent);
-  pointer-events: none;
-  z-index: 0;
+button, input, textarea, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
-/* ========== Scrollbar ========== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+::selection { background: var(--accent-soft); color: inherit; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-primary); }
-
-/* ========== Selection ========== */
-::selection {
-  background: rgba(99, 102, 241, 0.25);
-  color: inherit;
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--border-hover);
+  background-clip: padding-box;
 }
 
-/* ========== Utility Classes ========== */
-.glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.site-shell {
+  background:
+    linear-gradient(90deg, transparent 0, transparent calc(50% - 1px), var(--border-subtle) 50%, transparent calc(50% + 1px)) top 5rem center / min(1180px, calc(100% - 2rem)) 1px no-repeat,
+    var(--bg-primary);
+}
+
+.site-header {
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-nav);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+}
+
+.brand-mark {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--border-hover);
+  border-radius: 0.55rem;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  box-shadow: inset 0 0 0 3px var(--bg-primary);
+}
+
+.brand-mark::after {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.75rem;
+  height: 1px;
+  background: var(--accent-secondary);
+}
+
+.primary-action,
+.secondary-action {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border-radius: 0.65rem;
+  padding: 0.7rem 1.05rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1;
+  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.primary-action {
+  border: 1px solid var(--accent-primary-strong);
+  background: var(--accent-primary-strong);
+  color: #fff;
+  box-shadow: 0 6px 20px var(--glow-primary);
+}
+
+.primary-action:hover { background: var(--accent-primary); transform: translateY(-1px); }
+
+.secondary-action {
   border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
-.accent-text {
-  color: var(--accent-primary);
-  letter-spacing: -0.02em;
+.secondary-action:hover { border-color: var(--border-hover); background: var(--bg-tertiary); }
+
+.text-action {
+  border-radius: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 550;
+  transition: color 150ms ease, background-color 150ms ease;
 }
+
+.text-action:hover { color: var(--text-primary); background: var(--bg-muted); }
+
+.workspace-preview {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #303a48;
+  border-radius: 0.9rem;
+  background: #0c1118;
+  color: #eef2f7;
+  box-shadow: 0 30px 80px rgba(4, 8, 13, 0.28);
+}
+
+.workspace-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.preview-window {
+  border: 1px solid #333e4d;
+  border-radius: 0.6rem;
+  background: #151c26;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
+}
+
+.hairline-list > * + * { border-top: 1px solid var(--border-subtle); }
+
+.fact-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.55fr) minmax(0, 1fr);
+  gap: 2rem;
+  padding: 1.25rem 0;
+}
+
+.dialog-backdrop {
+  background: rgba(3, 7, 12, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dialog-surface {
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.85rem;
+  background: var(--bg-secondary);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.field-input {
+  width: 100%;
+  border: 1px solid var(--bg-input-border);
+  border-radius: 0.6rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  padding: 0.72rem 0.8rem;
+  font-size: 0.875rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.field-input::placeholder { color: var(--text-muted); }
+.field-input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-soft); outline: none; }
 
 .gradient-btn {
-  background: var(--accent-primary);
-  box-shadow: 0 1px 4px rgba(249, 112, 102, 0.2);
-  transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
-}
-.gradient-btn:hover {
-  box-shadow: 0 2px 12px rgba(249, 112, 102, 0.35);
-  transform: translateY(-1px);
-}
-.gradient-btn:active {
-  transform: translateY(0);
+  border: 1px solid var(--accent-primary-strong);
+  background: var(--accent-primary-strong);
+  color: #fff;
+  box-shadow: none;
+  transition: background-color 150ms ease, transform 150ms ease;
 }
 
-/* ========== Animations ========== */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-15px) scale(1.01); }
-}
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 2px 12px rgba(99,102,241,0.25); }
-  50% { box-shadow: 0 4px 24px rgba(99,102,241,0.4); }
-}
+.gradient-btn:hover { background: var(--accent-primary); }
+.gradient-btn:active, .primary-action:active { transform: translateY(0); }
 
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
-.animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
-.animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-.animate-scale-in { animation: scale-in 0.3s ease-out forwards; }
-.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
-
-/* ========== Card Styles ========== */
-/* `--bg-secondary`, not `--bg-card`: the latter is a 3% white overlay in dark
-   mode, so a card sitting on the near-black page read as no card at all. */
-.feature-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.25s ease;
-}
-.feature-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--accent-primary);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-.feature-card:hover {
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-card-hover);
-}
-.feature-card:hover::before {
-  transform: scaleX(1);
-}
-
-.step-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  transition: all 0.25s ease;
-}
-.step-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--accent-primary);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-}
-.step-card:hover {
-  border-color: var(--border-hover);
-}
-.step-card:hover::before {
-  transform: scaleX(1);
-}
-
-/* ========== Table Row ========== */
-.table-row { transition: background-color 0.15s ease; }
-.table-row:hover { background-color: var(--bg-muted); }
-
-/* ========== Stat Badge ========== */
+.feature-card,
+.step-card,
 .stat-badge {
-  background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
-  transition: all 0.2s ease;
-}
-.stat-badge:hover {
-  border-color: var(--border-hover);
-}
-
-/**
- * ========== Room chrome ==========
- *
- * Panel fills for anything that floats over live video. These are the classes to
- * reach for instead of `bg-[var(--bg-card)]` / `bg-[var(--bg-glass)]`, which are
- * 3–4% white overlays and read as fully transparent once there is a face behind
- * them.
- */
-.ftos-panel {
-  background: var(--surface-panel);
-  border-color: var(--surface-border);
-  color: var(--on-surface);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-card);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
-/* One step up from a panel: rows, inputs and menu items *inside* a panel. */
-.ftos-raised {
-  background: var(--surface-raised);
-  border-color: var(--surface-border);
-  color: var(--on-surface);
-}
+.feature-card:hover,
+.step-card:hover,
+.stat-badge:hover { border-color: var(--border-hover); box-shadow: var(--shadow-card-hover); }
 
-/* Name tags and status chips sitting directly on video — translucent on purpose,
-   but with a blur behind them so the text keeps its contrast either way. */
+.ftos-panel { border-color: var(--surface-border); background: var(--surface-panel); color: var(--on-surface); }
+.ftos-raised { border-color: var(--surface-border); background: var(--surface-raised); color: var(--on-surface); }
 .ftos-pill {
   background: var(--surface-overlay);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   color: var(--on-surface);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
 }
-
 .ftos-muted { color: var(--on-surface-muted); }
+.ftos-notice-warn { border: 1px solid var(--notice-warn-border); background: var(--notice-warn-bg); color: var(--notice-warn-text); }
+.ftos-notice-info { border: 1px solid var(--notice-info-border); background: var(--notice-info-bg); color: var(--notice-info-text); }
 
-.ftos-notice-warn {
-  background: var(--notice-warn-bg);
-  border: 1px solid var(--notice-warn-border);
-  color: var(--notice-warn-text);
-}
-
-.ftos-notice-info {
-  background: var(--notice-info-bg);
-  border: 1px solid var(--notice-info-border);
-  color: var(--notice-info-text);
+.room-shell {
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    var(--bg-base);
+  background-size: 28px 28px;
 }
 
-/**
- * These three are load-bearing: the call controls, the chat and timeline panels,
- * and every scrolling list in the room already reference them by name. Panels
- * that appear without them still work, they just snap into place.
- */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-hover) transparent;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
-  border-radius: 4px;
+.room-drawer {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.85rem;
+  background: var(--surface-panel);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
 }
 
-/**
- * Y-axis only, deliberately.
- *
- * Tailwind 4 compiles `-translate-x-1/2` to the CSS `translate` property, not to
- * `transform`. The two compose, so a keyframe that also carried `translate(-50%, …)`
- * moved a centred element by a full 100% of its width — which is exactly why the
- * call controls sat flush against the left edge of the room instead of under the
- * middle of the video. Centring belongs to the utility class; the animation only
- * moves things up.
- */
+.room-statusbar {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.7rem;
+  background: var(--surface-overlay);
+  color: var(--on-surface);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+.control-dock {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.85rem;
+  background: var(--surface-overlay);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(18px) saturate(120%);
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+}
+
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--border-hover) transparent; }
+
 @keyframes ftos-rise {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.ftos-rise { animation: ftos-rise 0.22s ease-out both; }
 
 @keyframes ftos-fade {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.ftos-fade { animation: ftos-fade 0.18s ease-out both; }
 
-/* Respect the OS setting: none of these animations carry information. */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ftos-rise { animation: ftos-rise 180ms ease-out both; }
+.ftos-fade { animation: ftos-fade 160ms ease-out both; }
+.animate-fade-in { animation: ftos-fade 160ms ease-out both; }
+.animate-scale-in { animation: scale-in 160ms ease-out both; }
+.animate-fade-in-up { animation: ftos-rise 220ms ease-out both; }
+
+@media (max-width: 640px) {
+  .site-shell { background: var(--bg-primary); }
+  .fact-row { grid-template-columns: 1fr; gap: 0.4rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ftos-rise,
-  .ftos-fade,
-  .animate-float,
-  .animate-float-slow,
-  .animate-pulse-glow {
-    animation: none;
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
