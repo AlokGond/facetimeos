@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithCredential,
+  signInWithCustomToken,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -92,6 +93,12 @@ export function AuthProvider({ children }) {
    * check rather than a user-agent sniff, so the web build is untouched by it.
    */
   const loginWithGoogle = useCallback(async () => {
+    const windowsApp = typeof window !== 'undefined' ? window.faceTimeWindows : null;
+    if (windowsApp?.signIn) {
+      const { customToken } = await windowsApp.signIn();
+      if (!customToken) throw new Error('Sign-in did not complete.');
+      return signInWithCustomToken(requireAuth(), customToken);
+    }
     const desktop = typeof window !== 'undefined' ? window.facetimeosDesktop : null;
     if (desktop?.signInWithGoogle) {
       const { idToken } = await desktop.signInWithGoogle();

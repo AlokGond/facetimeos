@@ -6,6 +6,8 @@ node_modules/
 out/
 build/
 dist/
+release/
+windows-app/public/icon.ico
 
 # Environment / secrets — NEVER commit these
 .env
@@ -17,6 +19,8 @@ certificates/
 *.pem
 *.key
 *.crt
+*service-account*.json
+*firebase-adminsdk*.json
 
 # Runtime data (server-side room snapshots)
 .data/

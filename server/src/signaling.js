@@ -321,6 +321,11 @@ export function setupSignaling(io) {
         return respond({ ok: true, status: 'waiting', roomId, peerId });
       }
 
+      try { await docStore.ensureLoaded(roomId); }
+      catch {
+        deny('storage-unavailable', 'Saved work is temporarily unavailable. Please rejoin in a moment.');
+        return respond({ ok: false, error: 'storage-unavailable' });
+      }
       const result = roomManager.joinRoom({
         roomId,
         peerId,
@@ -610,6 +615,8 @@ export function setupSignaling(io) {
       if (!targetSocket?.data?.pending) return respond({ ok: false, error: 'gone' });
 
       const pending = targetSocket.data.pending;
+      try { await docStore.ensureLoaded(pending.roomId); }
+      catch { return respond({ ok: false, error: 'storage-unavailable' }); }
       const result = roomManager.joinRoom({
         roomId: pending.roomId,
         peerId: pending.peerId,
@@ -719,8 +726,10 @@ export function setupSignaling(io) {
       if (!guard(3)) return respond({ ok: false });
       const me = identity();
       if (!me) return respond({ ok: false });
-      await docStore.ensureLoaded(me.roomId);
-      return respond({ ok: true, updates: docStore.getUpdates(me.roomId) });
+      try {
+        await docStore.ensureLoaded(me.roomId);
+        return respond({ ok: true, updates: docStore.getUpdates(me.roomId) });
+      } catch { return respond({ ok: false, error: 'storage-unavailable' }); }
     });
 
     // ------------------------------------------------------------- leaving ---

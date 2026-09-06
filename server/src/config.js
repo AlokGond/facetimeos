@@ -121,6 +121,7 @@ export const STUN_URLS = list(process.env.STUN_URLS).length
   : ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'];
 
 export const DOC_STORE = {
+  provider: process.env.DOC_STORE_PROVIDER || 'local',
   dir: path.resolve(process.cwd(), process.env.DOC_STORE_DIR || '.data'),
   enabled: bool(process.env.DOC_STORE_ENABLED, true),
   /** Refuse to persist absurdly large docs (default 8 MiB). */
@@ -130,6 +131,10 @@ export const DOC_STORE = {
   /** Debounce window for flushing a room to disk. */
   flushDebounceMs: int(process.env.DOC_FLUSH_DEBOUNCE_MS, 2000),
 };
+
+if (!['local', 'firestore'].includes(DOC_STORE.provider)) {
+  throw new Error('DOC_STORE_PROVIDER must be local or firestore.');
+}
 
 export const ROOM_TTL_MS = int(process.env.ROOM_TTL_HOURS, 72) * 60 * 60 * 1000;
 

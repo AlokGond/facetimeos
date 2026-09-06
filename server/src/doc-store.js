@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { DOC_STORE, ROOM_TTL_MS } from './config.js';
+import { cloudArchive } from './firestore-archive.js';
 
 /**
  * Durable storage for a room's collaborative artifacts (code, notes,
@@ -27,6 +28,7 @@ const FORMAT_VERSION = 1;
 const store = new Map();
 /** roomId -> Promise, so concurrent joiners share a single disk read. */
 const loading = new Map();
+const writing = new Map();
 
 function safeFileName(roomId) {
   // Room ids are server-generated UUIDs, but never build a path from
@@ -87,6 +89,12 @@ function decode(buffer) {
 
 async function readFromDisk(roomId) {
   if (!DOC_STORE.enabled) return [];
+  if (DOC_STORE.provider === 'firestore') {
+    // Never treat a failed cloud read as an empty room: that could overwrite
+    // saved work with a fresh document after a transient network failure.
+    const raw = await cloudArchive.read(roomId);
+    return raw ? decode(raw) : [];
+  }
   try {
     const raw = await fs.readFile(safeFileName(roomId));
     return decode(raw);
@@ -204,9 +212,10 @@ function scheduleFlush(roomId, entry) {
   if (!DOC_STORE.enabled || entry.flushTimer) return;
   entry.flushTimer = setTimeout(() => {
     entry.flushTimer = null;
-    flush(roomId).catch((err) =>
-      console.warn(`[doc-store] flush failed for ${roomId}: ${err.message}`)
-    );
+    flush(roomId).catch((err) => {
+      console.warn(`[doc-store] flush failed for ${roomId}: ${err.message}`);
+      if (store.get(roomId) === entry) scheduleFlush(roomId, entry);
+    });
   }, DOC_STORE.flushDebounceMs);
   // A pending flush must not hold the process open on shutdown.
   entry.flushTimer.unref?.();
@@ -214,17 +223,28 @@ function scheduleFlush(roomId, entry) {
 
 /** Write a room to disk now. Atomic: write to a temp file, then rename. */
 export async function flush(roomId) {
+  if (writing.has(roomId)) {
+    await writing.get(roomId);
+    return flush(roomId);
+  }
   const entry = store.get(roomId);
   if (!DOC_STORE.enabled || !entry || !entry.dirty) return;
-
-  const target = safeFileName(roomId);
-  const temp = `${target}.${process.pid}.tmp`;
+  const seq = entry.seq;
   const payload = encode(entry.updates);
-
-  await fs.mkdir(DOC_STORE.dir, { recursive: true });
-  await fs.writeFile(temp, payload);
-  await fs.rename(temp, target);
-  entry.dirty = false;
+  const pending = (async () => {
+    if (DOC_STORE.provider === 'firestore') await cloudArchive.write(roomId, payload);
+    else {
+      const target = safeFileName(roomId);
+      const temp = `${target}.${process.pid}.tmp`;
+      await fs.mkdir(DOC_STORE.dir, { recursive: true });
+      await fs.writeFile(temp, payload);
+      await fs.rename(temp, target);
+    }
+    entry.dirty = entry.seq !== seq;
+    if (entry.dirty) scheduleFlush(roomId, entry);
+  })();
+  writing.set(roomId, pending);
+  try { await pending; } finally { writing.delete(roomId); }
 }
 
 export async function flushAll() {
@@ -232,10 +252,13 @@ export async function flushAll() {
 }
 
 export async function deleteRoom(roomId) {
+  if (loading.has(roomId)) await loading.get(roomId);
+  if (writing.has(roomId)) await writing.get(roomId);
   const entry = store.get(roomId);
   if (entry?.flushTimer) clearTimeout(entry.flushTimer);
   store.delete(roomId);
   if (!DOC_STORE.enabled) return;
+  if (DOC_STORE.provider === 'firestore') return cloudArchive.remove(roomId);
   try {
     await fs.unlink(safeFileName(roomId));
   } catch (err) {
@@ -251,7 +274,14 @@ export async function evictExpired(now = Date.now()) {
     .filter(([, entry]) => now - entry.lastTouched > ROOM_TTL_MS)
     .map(([roomId]) => roomId);
   for (const roomId of expired) {
-    await deleteRoom(roomId);
+    if (DOC_STORE.provider === 'firestore') {
+      // Evict only the memory cache; durable Firestore rooms are kept until
+      // their host explicitly deletes the artifacts.
+      await flush(roomId);
+      const entry = store.get(roomId);
+      if (entry?.flushTimer) clearTimeout(entry.flushTimer);
+      store.delete(roomId);
+    } else await deleteRoom(roomId);
   }
   return expired.length;
 }

@@ -576,7 +576,8 @@ function RoomWorkspace({ roomId, session, onSessionPatch, onLeaveSession }) {
   /* --------------------------------- actions -------------------------------- */
 
   const shareLink = useCallback(async () => {
-    const url = `${window.location.origin}/room/${roomId}`;
+    const origin = process.env.NEXT_PUBLIC_WEB_URL || window.location.origin;
+    const url = `${origin}/room/${roomId}`;
     try {
       await navigator.clipboard.writeText(url);
       notify('Invite link copied to your clipboard.');

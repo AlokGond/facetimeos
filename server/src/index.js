@@ -3,7 +3,9 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 
-import { CLIENT_ORIGINS, PORT, ROOM_TTL_MS, MAX_PEERS_PER_ROOM } from './config.js';
+import { CLIENT_ORIGINS, PORT, ROOM_TTL_MS, MAX_PEERS_PER_ROOM, DOC_STORE } from './config.js';
+import { firebaseAdminConfigured } from './firebase-admin.js';
+import { desktopAuthRouter } from './desktop-auth.js';
 import {
   ROLES,
   isUuid,
@@ -30,7 +32,7 @@ const httpServer = createServer(app);
 const corsOrigin = CLIENT_ORIGINS ?? true;
 
 app.disable('x-powered-by');
-app.use(cors({ origin: corsOrigin, methods: ['GET', 'POST'], credentials: true }));
+app.use(cors({ origin: corsOrigin, methods: ['GET', 'POST', 'DELETE'], credentials: true }));
 app.use(express.json({ limit: '32kb' }));
 
 app.use((req, res, next) => {
@@ -54,12 +56,16 @@ setupSignaling(io);
  * behind one HTTPS origin — which is what getUserMedia requires on phones.
  */
 const api = express.Router();
+const asyncRoute = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+api.use('/desktop-auth', desktopAuthRouter());
 
 api.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     ...roomManager.stats(),
     turn: turnConfigured(),
+    storage: DOC_STORE.enabled ? DOC_STORE.provider : 'disabled',
+    desktopAuth: firebaseAdminConfigured(),
     uptimeSeconds: Math.round(process.uptime()),
   });
 });
@@ -112,7 +118,7 @@ api.post('/rooms', (req, res) => {
 });
 
 /** Cheap pre-join probe so the UI can say "this room has saved work in it". */
-api.get('/rooms/:roomId', async (req, res) => {
+api.get('/rooms/:roomId', asyncRoute(async (req, res) => {
   const { roomId } = req.params;
   if (!isUuid(roomId)) return res.status(400).json({ error: 'bad-room-id' });
 
@@ -130,14 +136,14 @@ api.get('/rooms/:roomId', async (req, res) => {
     maxPeers: MAX_PEERS_PER_ROOM,
     hasSavedWork: stats.hasContent,
   });
-});
+}));
 
 /**
  * Exchange an invite token (or a previous session token) for a session token.
  * The returned peerId is generated *here*: the client can no longer pick its own
  * identity, which is what made impersonation possible before.
  */
-api.post('/rooms/:roomId/session', async (req, res) => {
+api.post('/rooms/:roomId/session', asyncRoute(async (req, res) => {
   const { roomId } = req.params;
   if (!isUuid(roomId)) return res.status(400).json({ error: 'bad-room-id' });
 
@@ -182,7 +188,7 @@ api.post('/rooms/:roomId/session', async (req, res) => {
     sessionToken: signSessionToken({ roomId, peerId, role, displayName }),
     hasSavedWork: docStore.getStats(roomId).hasContent,
   });
-});
+}));
 
 /** Host-only: mint an additional share link with a specific role. */
 api.post('/rooms/:roomId/invites', (req, res) => {
@@ -199,7 +205,7 @@ api.post('/rooms/:roomId/invites', (req, res) => {
 });
 
 /** Host-only: forget a room's saved artifacts. Irreversible, hence host-gated. */
-api.delete('/rooms/:roomId/artifacts', async (req, res) => {
+api.delete('/rooms/:roomId/artifacts', asyncRoute(async (req, res) => {
   const { roomId } = req.params;
   const claims = verifySessionToken(req.body?.sessionToken || req.query.sessionToken);
   if (!claims || claims.roomId !== roomId || claims.role !== ROLES.HOST) {
@@ -208,7 +214,7 @@ api.delete('/rooms/:roomId/artifacts', async (req, res) => {
   await docStore.deleteRoom(roomId);
   io.to(`room:${roomId}`).emit('artifacts-cleared', { by: claims.peerId });
   return res.json({ ok: true });
-});
+}));
 
 app.use('/rtc', api);
 // Kept for backwards compatibility with the old health probe path.
@@ -219,7 +225,7 @@ app.use((req, res) => res.status(404).json({ error: 'not-found' }));
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error('[http]', err.message);
-  res.status(err.status || 500).json({ error: 'server-error' });
+  res.status(err.status || 500).json({ error: 'server-error', message: 'The server could not complete this request. Your saved work has not been replaced; please retry.' });
 });
 
 const evictionTimer = setInterval(
