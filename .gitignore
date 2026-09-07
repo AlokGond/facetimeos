@@ -21,6 +21,11 @@ certificates/
 *.crt
 *service-account*.json
 *firebase-adminsdk*.json
+*.jks
+*.p12
+*.pfx
+*signing*.properties
+google-services.json
 
 # Runtime data (server-side room snapshots)
 .data/
