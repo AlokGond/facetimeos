@@ -1,6 +1,8 @@
 param([string]$JavaPath = 'C:/Program Files/Android/Android Studio1/jbr', [string]$SdkPath = "$env:LOCALAPPDATA/Android/Sdk", [string]$GradlePath = '', [switch]$FingerprintsOnly)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
+$version = (Get-Content -LiteralPath "$projectDir/package.json" -Raw | ConvertFrom-Json).version
+if ($version -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$') { throw 'Invalid release version.' }
 $signingDir = Join-Path $env:LOCALAPPDATA 'FaceTimeOS/signing'
 $keyFile = Join-Path $signingDir 'android-release.jks'
 $passwordFile = Join-Path $signingDir 'android-release-password.dpapi'
@@ -45,7 +47,7 @@ try {
   if ($LASTEXITCODE -ne 0) { throw 'APK signature verification failed; do not publish.' }
   $releaseDir = Join-Path $projectDir 'release'
   New-Item -ItemType Directory -Force -Path $releaseDir | Out-Null
-  $releaseApk = Join-Path $releaseDir 'FaceTimeOS-1.0.0-beta.1-android.apk'
+  $releaseApk = Join-Path $releaseDir "FaceTimeOS-$version-android.apk"
   Copy-Item -LiteralPath $apk -Destination $releaseApk
   $checksum = (Get-FileHash -LiteralPath $releaseApk -Algorithm SHA256).Hash.ToLowerInvariant()
   "$checksum  $([IO.Path]::GetFileName($releaseApk))" | Set-Content -LiteralPath "$releaseApk.sha256" -Encoding ascii

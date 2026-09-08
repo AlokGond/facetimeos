@@ -491,10 +491,23 @@ export default function Meeting({ invite, user, onLeave }) {
     [pinned, setPinned] = useState(null),
     [actionBusy, setActionBusy] = useState(false);
   useEffect(() => {
-    const engine = new RoomEngine(invite, user, setState);
-    engineRef.current = engine;
-    engine.begin(invite.options);
-    return () => engine.dispose();
+    let roomEngine;
+    try {
+      roomEngine = new RoomEngine(invite, user, setState);
+      engineRef.current = roomEngine;
+      roomEngine.begin(invite.options);
+    } catch (error) {
+      setState(current => ({
+        ...current,
+        status: 'Could not start meeting',
+        error: error.message,
+        connected: false,
+      }));
+    }
+    return () => {
+      roomEngine?.dispose();
+      engineRef.current = null;
+    };
   }, [invite, user]);
   const engine = engineRef.current;
   const askLeave = () =>
@@ -772,7 +785,11 @@ export default function Meeting({ invite, user, onLeave }) {
               <Text style={{ color: '#a6b7d1', fontSize: 10 }}>{label}</Text>
             </Pressable>
           ))}
-          <Pressable style={m.tab} onPress={() => select('settings')}>
+          <Pressable
+            style={m.tab}
+            disabled={!state.mediaReady}
+            onPress={() => select('settings')}
+          >
             <MoreHorizontal color="#a6b7d1" size={19} />
             <Text style={{ color: '#a6b7d1', fontSize: 10 }}>More</Text>
           </Pressable>

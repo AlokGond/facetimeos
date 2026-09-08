@@ -1,8 +1,10 @@
 param([Parameter(Mandatory=$true)][string]$Commit, [Parameter(Mandatory=$true)][string]$NotesPath)
 $ErrorActionPreference = 'Stop'
 $projectDir = Split-Path -Parent $PSScriptRoot
-$apk = Join-Path $projectDir 'release/FaceTimeOS-1.0.0-beta.1-android.apk'
-$tag = 'android-v1.0.0-beta.1'
+$version = (Get-Content -LiteralPath "$projectDir/package.json" -Raw | ConvertFrom-Json).version
+if ($version -notmatch '^\d+\.\d+\.\d+-beta\.\d+$') { throw 'This publishing script is for Android beta releases.' }
+$apk = Join-Path $projectDir "release/FaceTimeOS-$version-android.apk"
+$tag = "android-v$version"
 if ($Commit -notmatch '^[0-9a-f]{40}$') { throw 'Supply the full tested Git commit.' }
 if (!(Test-Path -LiteralPath $apk) -or !(Test-Path -LiteralPath "$apk.sha256")) { throw 'Build and verify the release first.' }
 $actualHash = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()
@@ -20,7 +22,7 @@ try {
   if ($remoteCommit.sha -ne $Commit) { throw 'Push the tested commit first.' }
   $existing = @(Invoke-RestMethod "$base/releases" -Headers $headers) | Where-Object tag_name -eq $tag
   if ($existing) { throw 'This release already exists. Inspect it; do not overwrite published APKs.' }
-  $release = Invoke-RestMethod "$base/releases" -Method Post -Headers $headers -ContentType 'application/json' -Body (@{tag_name=$tag; target_commitish=$Commit; name='FaceTimeOS Android 1.0.0-beta.1'; draft=$true; prerelease=$true; body=(Get-Content -LiteralPath $NotesPath -Raw)} | ConvertTo-Json)
+  $release = Invoke-RestMethod "$base/releases" -Method Post -Headers $headers -ContentType 'application/json' -Body (@{tag_name=$tag; target_commitish=$Commit; name="FaceTimeOS Android $version"; draft=$true; prerelease=$true; body=(Get-Content -LiteralPath $NotesPath -Raw)} | ConvertTo-Json)
   foreach ($file in @($apk, "$apk.sha256")) {
     $assetName = [Uri]::EscapeDataString([IO.Path]::GetFileName($file))
     $uploadUrl = $release.upload_url.Split('{')[0] + '?name=' + $assetName

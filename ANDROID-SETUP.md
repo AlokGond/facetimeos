@@ -71,11 +71,11 @@ If the wrapper download times out on this network, select the already downloaded
 ./tools/build-android.ps1 -GradlePath C:/Users/Alok/AppData/Local/FaceTimeOS/build-tools/gradle-9.3.1/bin/gradle.bat
 ```
 
-The script requires release credentials, verifies the APK using `apksigner`, and copies it to `mobile-app/release/FaceTimeOS-1.0.0-beta.1-android.apk`. Native C++ intermediates use a shorter cache to avoid Windows path-length failures. This does not change system-wide Java settings.
+The script requires release credentials, verifies the APK using `apksigner`, and copies it to `mobile-app/release/FaceTimeOS-<package-version>-android.apk` with a SHA-256 checksum. Native C++ intermediates use a shorter cache to avoid Windows path-length failures. This does not change system-wide Java settings.
 
 `npm ci` applies the checked-in WebView security patch. It denies webpage camera/microphone requests even when the native meeting has those permissions. Do not remove this patch when upgrading WebView. Shared pages/code previews have no React Native message bridge or app cookies.
 
-Before each update, increment `versionCode` and `versionName` in `android/app/build.gradle`, package version, `src/config.js`, and artifact name in the build script. Use the **same key** so Android can install over the previous version.
+Before each update, increment `versionCode` and `versionName` in `android/app/build.gradle`, package version and `src/config.js`. Build and publish scripts derive artifact names from the package version. Use the **same key** so Android can install over the previous version; do not uninstall the old app first.
 
 ## Signing key: back up before reinstalling Windows
 
