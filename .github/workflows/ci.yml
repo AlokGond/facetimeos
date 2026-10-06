@@ -1,6 +1,6 @@
 name: CI
 
-# Three packages, three jobs, run on every push and pull request. None of them needs
+# Package checks run on every push and pull request. None of them needs
 # a browser, a camera or a TURN server: everything here is logic that runs in bare
 # Node, which is also the reason the test suites are shaped the way they are.
 
@@ -70,7 +70,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.11'
+          node-version: '22'
           cache: npm
           cache-dependency-path: client/package-lock.json
 
@@ -101,7 +101,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.11'
+          node-version: '22'
           cache: npm
           cache-dependency-path: desktop/package-lock.json
 
