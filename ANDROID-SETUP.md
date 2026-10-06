@@ -61,6 +61,7 @@ Requirements: Node 22.11+, npm, Android SDK 36/build-tools 36, NDK 27.1.12297006
 ```powershell
 cd C:\Users\Alok\OneDrive\Desktop\Project\facetimeos\mobile-app
 npm ci
+npm --prefix ../server ci
 npm test -- --runInBand
 ./tools/build-android.ps1
 ```
@@ -72,6 +73,8 @@ If the wrapper download times out on this network, select the already downloaded
 ```
 
 The script requires release credentials, verifies the APK using `apksigner`, and copies it to `mobile-app/release/FaceTimeOS-<package-version>-android.apk` with a SHA-256 checksum. Native C++ intermediates use a shorter cache to avoid Windows path-length failures. This does not change system-wide Java settings.
+
+The Android test suite includes an isolated local-server interoperability test, so install `server/` dependencies as shown above. It does not use the hosted service, Firebase secrets or real meeting data. Offers and answers must use `{ to, sdp }` outbound and `{ from, sdp }` inbound; changing those keys breaks interoperability even when participant names still appear.
 
 `npm ci` applies the checked-in WebView security patch. It denies webpage camera/microphone requests even when the native meeting has those permissions. Do not remove this patch when upgrading WebView. Shared pages/code previews have no React Native message bridge or app cookies.
 

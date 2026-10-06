@@ -4,6 +4,7 @@ Native Android client for the existing FaceTimeOS rooms. See [setup, signing, Fi
 
 ```powershell
 npm ci
+npm --prefix ../server ci
 npm test -- --runInBand
 ./tools/build-android.ps1
 ```

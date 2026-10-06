@@ -61,7 +61,16 @@ function Control({ icon: Icon, label, onPress, active, danger, disabled }) {
     </Pressable>
   );
 }
-function Tile({ peer, stream, local, media, pinned, onPress, quality }) {
+function Tile({
+  peer,
+  stream,
+  local,
+  media,
+  pinned,
+  onPress,
+  quality,
+  connection,
+}) {
   const visible =
     stream && (local ? media?.video : media?.video !== false || media?.screen);
   return (
@@ -96,6 +105,16 @@ function Tile({ peer, stream, local, media, pinned, onPress, quality }) {
             {peer.role?.toUpperCase()}
             {media?.screen ? ' · SHARING SCREEN' : ''}
             {quality === 'poor' ? ' · WEAK CONNECTION' : ''}
+            {!local &&
+            (!connection || connection === 'new' || connection === 'connecting')
+              ? ' · CONNECTING MEDIA'
+              : ''}
+            {!local && connection === 'disconnected'
+              ? ' · RECONNECTING MEDIA'
+              : ''}
+            {!local && connection === 'failed'
+              ? ' · MEDIA FAILED — REJOIN'
+              : ''}
           </Text>
         </View>
         {media?.audio === false && <MicOff color="white" size={15} />}
@@ -678,6 +697,7 @@ export default function Meeting({ invite, user, onLeave }) {
               setPinned(pinned === peer.peerId ? null : peer.peerId)
             }
             quality={state.quality?.[peer.peerId]}
+            connection={state.connections?.[peer.peerId]}
           />
         ))}
         {remote.length === 0 && state.connected && (

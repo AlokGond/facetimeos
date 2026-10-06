@@ -118,13 +118,6 @@ export class RoomEngine {
         timeout: 25000,
       });
       this.wire();
-      this.rtc.onDescription = (to, description) =>
-        this.socket.emit(
-          description.type === 'offer' ? 'sdp-offer' : 'sdp-answer',
-          { to, [description.type]: description },
-        );
-      this.rtc.onIceCandidate = (to, candidate) =>
-        this.socket.emit('ice-candidate', { to, candidate });
       this.rtc.onRemoteStream = (id, stream) =>
         this.patch({ streams: { ...this.state.streams, [id]: stream } });
       this.rtc.onRemoteStreamEnded = id => {
@@ -132,10 +125,6 @@ export class RoomEngine {
         delete streams[id];
         this.patch({ streams });
       };
-      this.rtc.onConnectionStateChange = (id, quality) =>
-        this.patch({
-          connections: { ...this.state.connections, [id]: quality },
-        });
       this.rtc.onQualityUpdate = (id, quality) =>
         this.patch({
           quality: { ...this.state.quality, [id]: quality.quality },
@@ -187,6 +176,24 @@ export class RoomEngine {
   }
   wire() {
     const s = this.socket;
+    // Both browser/desktop and the server relay use { to, sdp }, for BOTH
+    // offers and answers. A different key is silently dropped by the relay.
+    this.rtc.onDescription = (to, description) => {
+      if (!['offer', 'answer'].includes(description?.type)) return;
+      s.emit(`sdp-${description.type}`, {
+        to,
+        sdp: { type: description.type, sdp: description.sdp },
+      });
+    };
+    this.rtc.onIceCandidate = (to, candidate) =>
+      s.emit('ice-candidate', { to, candidate });
+    this.rtc.onConnectionStateChange = (id, connection) => {
+      // Deliberately omit SDP, addresses, credentials and room/session tokens.
+      console.info('[meeting/media]', connection);
+      this.patch({
+        connections: { ...this.state.connections, [id]: connection },
+      });
+    };
     s.on('connect', async () => {
       this.patch({ status: 'Joining', error: '' });
       try {
@@ -206,7 +213,16 @@ export class RoomEngine {
     s.on('disconnect', () => {
       this.joined = false;
       this.storageReady = false;
-      this.patch({ status: 'Reconnecting', connected: false });
+      // A rejoin must negotiate again, including when the remote client kept
+      // the same peer ID. Do not keep stale streams or failed peer instances.
+      for (const id of this.rtc.peers.keys()) this.rtc.closePeer(id);
+      this.patch({
+        status: 'Reconnecting',
+        connected: false,
+        streams: {},
+        connections: {},
+        media: {},
+      });
     });
     s.on('connect_error', () =>
       this.patch({
@@ -269,11 +285,9 @@ export class RoomEngine {
       );
       this.patch({ role: event.role });
     });
-    s.on('sdp-offer', ({ from, offer }) =>
-      this.rtc.handleDescription(from, offer),
-    );
-    s.on('sdp-answer', ({ from, answer }) =>
-      this.rtc.handleDescription(from, answer),
+    s.on('sdp-offer', ({ from, sdp }) => this.rtc.handleDescription(from, sdp));
+    s.on('sdp-answer', ({ from, sdp }) =>
+      this.rtc.handleDescription(from, sdp),
     );
     s.on('ice-candidate', ({ from, candidate }) =>
       this.rtc.handleCandidate(from, candidate),
@@ -345,8 +359,16 @@ export class RoomEngine {
   }
   updatePeers(peers) {
     const self = peers.find(p => p.peerId === this.session?.peerId);
+    const active = new Set(peers.map(p => p.peerId));
+    const retain = values =>
+      Object.fromEntries(
+        Object.entries(values || {}).filter(([id]) => active.has(id)),
+      );
     this.patch({
       peers,
+      streams: retain(this.state.streams),
+      connections: retain(this.state.connections),
+      media: retain(this.state.media),
       ...(self ? { role: self.role, tools: self.tools || {} } : {}),
     });
     for (const peer of peers)
@@ -405,7 +427,12 @@ export class RoomEngine {
   }
   async setAudio(enabled) {
     try {
-      let track = this.stream?.getAudioTracks()[0];
+      if (this.closed || !this.stream) return;
+      let track = this.stream.getAudioTracks()[0];
+      if (track?.readyState === 'ended') {
+        this.stream.removeTrack(track);
+        track = null;
+      }
       if (enabled && !track) {
         if (
           !(await this.requestPermission(
@@ -430,7 +457,7 @@ export class RoomEngine {
         await this.rtc.replaceAudioTrack(track);
       }
       if (track) track.enabled = enabled;
-      this.patch({ audio: enabled });
+      this.patch({ audio: Boolean(track && enabled) });
       this.announce();
     } catch (error) {
       this.patch({ error: error.message });
@@ -439,10 +466,8 @@ export class RoomEngine {
   async setVideo(enabled) {
     if (this.closed || !this.stream) return;
     if (this.state.screen) await this.stopScreen();
-    for (const track of this.stream?.getVideoTracks() || []) {
-      this.stream.removeTrack(track);
-      track.stop();
-    }
+    const previous = this.stream.getVideoTracks();
+    let nextTrack = null;
     if (enabled) {
       if (
         !(await this.requestPermission(PermissionsAndroid.PERMISSIONS.CAMERA))
@@ -461,9 +486,16 @@ export class RoomEngine {
         track.stop();
         return;
       }
-      this.stream.addTrack(track);
-      await this.rtc.replaceVideoTrack(track);
-    } else await this.rtc?.replaceVideoTrack(null);
+      nextTrack = track;
+    }
+    // Keep the old camera until permission/capture succeeds; a denied prompt
+    // must not leave an ended track with the UI still reporting camera-on.
+    await this.rtc?.replaceVideoTrack(nextTrack);
+    for (const track of previous) {
+      this.stream.removeTrack(track);
+      track.stop();
+    }
+    if (nextTrack) this.stream.addTrack(nextTrack);
     this.patch({ video: enabled, localStream: this.stream });
     this.announce();
   }
